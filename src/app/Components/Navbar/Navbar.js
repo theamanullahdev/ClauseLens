@@ -1,9 +1,10 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X, Sun, Moon, Zap } from "lucide-react";
+import { useAppContext } from "@/Contexts/AppRouters";
 
 const navItems = [
   { label: "Home", href: "/" },
@@ -14,13 +15,9 @@ const navItems = [
 
 const Navbar = () => {
   const pathname = usePathname();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(true); // Dark mode first
-
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-    // Full theming will be added later
-  };
+  const [menuOpen, setMenuOpen] = React.useState(false);
+  const { theme, toggleTheme } = useAppContext();
+  const isDarkMode = theme === "dark";
 
   // Theme styles: Dark mode hero, Light mode polite cousin
   const containerClass = isDarkMode

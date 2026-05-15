@@ -93,7 +93,7 @@ const Marquee = () => (
 
 /* ─── faq item ─── */
 const FAQ_DATA = [
-  { q: "Is my contract data stored anywhere?", a: "Never. Files are processed entirely in-memory and discarded after analysis. We don't log, store, or transmit your documents to any third party." },
+  { q: "Is my contract data stored anywhere?", a: "Never. Files are processed entirely in-memory and discarded after analysis. We don&apos;t log, store, or transmit your documents to any third party." },
   { q: "What file types are supported?", a: "PDF, DOCX, and TXT up to 10MB each. If your contract is in another format, convert it to one of these first." },
   { q: "How does the risk scoring work?", a: "Our AI reads both contract versions and classifies each change as CRITICAL, MODERATE, or MINOR based on legal weight, financial exposure, and enforceability impact." },
   { q: "Do I need an account?", a: "No. ClauseLens requires zero login, zero signup. Just upload and analyze." },
@@ -305,7 +305,7 @@ const AboutPage = () => {
             <p className="text-neutral-400 text-sm sm:text-base leading-relaxed mb-4">
               Contracts get revised. Clauses get swapped, liability caps quietly halved,
               termination windows tightened. Most people sign without catching it — not
-              because they're careless, but because line-by-line comparison is brutal.
+              because they&apos;re careless, but because line-by-line comparison is brutal.
             </p>
             <p className="text-neutral-400 text-sm sm:text-base leading-relaxed">
               ClauseLens flags every change, explains it in plain English, and tells you
@@ -387,14 +387,14 @@ const AboutPage = () => {
       <section className="w-[82%] mx-auto py-16 border-t border-[#2a2e2a]">
         <motion.div {...fadeUp()} className="mb-12">
           <p className="text-xs font-bold text-[#00ff88] uppercase tracking-widest mb-3">Our Principles</p>
-          <h2 className="text-3xl sm:text-4xl font-extrabold">What we won't compromise on.</h2>
+          <h2 className="text-3xl sm:text-4xl font-extrabold">What we won&apos;t compromise on.</h2>
         </motion.div>
 
         <div className="grid sm:grid-cols-3 gap-5">
           {[
             { icon: "🔒", title: "Privacy first", body: "Zero storage. Zero logging. Your contract never leaves your session. We process in memory and discard immediately.", accent: "#00ff88" },
-            { icon: "⚡", title: "Speed matters", body: "Analysis in seconds, not minutes. Because time is the one thing you can't get back when a deadline is closing in.", accent: "#00aaff" },
-            { icon: "🎯", title: "Clarity over jargon", body: "Legal language stays legal. Our explanations don't. You shouldn't need a law degree to understand your own risk.", accent: "#ff9900" },
+            { icon: "⚡", title: "Speed matters", body: "Analysis in seconds, not minutes. Because time is one thing you can&apos;t get back when a deadline is closing in.", accent: "#00aaff" },
+            { icon: "🎯", title: "Clarity over jargon", body: "Legal language stays legal. Our explanations don&apos;t. You shouldn&apos;t need a law degree to understand your own risk.", accent: "#ff9900" },
           ].map((v, i) => (
             <motion.div
               key={v.title}
