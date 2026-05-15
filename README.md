@@ -1,130 +1,150 @@
-# ✉️ Lettersmith AI
+# ClauseLens
 
-Lettersmith AI is a modern web app that helps you **instantly generate tailored cover letters** using your CV and job description — right in the browser.
+**Contract Review That Thinks Like a Lawyer**
 
-Built with **Next.js 15**, **React 19**, **Framer Motion**, and powered by **OpenRouter API**, it combines a sleek user experience with serverless AI generation.
+ClauseLens is an AI-powered contract comparison tool that helps users analyze changes between two versions of a legal document. Upload your original and revised contracts to receive a complete risk report — every change detected, risk-scored, and explained in plain English.
 
 ---
 
-## 🚀 Features
+## ✨ Features
 
-- ✨ Generate custom cover letters from your CV + job description
-- 📄 Upload `.pdf` or `.docx` resumes (processed fully in-browser)
-- 🔄 Choose tone, length, style, and language
-- ⚙️ Copy, download as PDF or DOCX — all in one click
-- ⚡ Fast, no backend API calls for file parsing (client-side parsing)
-- 🎨 Smooth animations, responsive design, minimal UI
+- 🔍 Detects changes between two contract versions
+- ⚠️ Risk scoring system: **CRITICAL / MODERATE / MINOR**
+- 💬 Explains legal changes in plain English
+- ✅ Smart recommendations: **Reject / Negotiate / Acceptable**
+- 📄 Supports PDF, DOCX, and TXT files
+- ⚡ Fast contract analysis powered by AI
+- 🔒 No login required
+- 🧠 Clean and modern UI with smooth UX
+
+---
+
+## 🚀 How It Works
+
+1. Open the application
+2. Upload your **original** contract
+3. Upload the **revised** contract
+4. Click **Analyze My Contract**
+5. Review the generated risk report and recommendations
+
+---
+
+## 📂 Supported File Formats
+
+- PDF
+- DOCX
+- TXT
+
+**Maximum file size:** 10MB per file
 
 ---
 
 ## 🛠 Tech Stack
 
-- **Framework**: Next.js (App Router, React Server Components)
-- **Styling**: Tailwind CSS
-- **Animation**: Framer Motion
-- **PDF Parsing**: `pdfjs-dist`
-- **DOCX Parsing**: `mammoth`
-- **Export Utilities**: `pdf-lib`, `docx`
-- **AI API**: OpenRouter (LLM wrapper)
+- **Framework:** Next.js 14 (App Router)
+- **Frontend:** React + Tailwind CSS
+- **UI Components:** shadcn/ui
+- **Animations:** Framer Motion
+- **AI Model:** Anthropic Claude (`claude-sonnet-4-20250514`)
+- **PDF Parsing:** `pdf-parse`
+- **DOCX Parsing:** `mammoth.js`
+- **Deployment:** Vercel
 
 ---
 
 ## 🧪 Getting Started
 
-### 1. Clone the repo
+### 1 — Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/lettersmith.git
-cd lettersmith
+git clone https://github.com/your-username/clauselens.git
+cd clauselens
 ```
 
-### 2. Install dependencies
+### 2 — Install Dependencies
 
 ```bash
 npm install
 ```
 
-### 3. Set up your OpenRouter API key
+### 3 — Configure Environment Variables
 
-Rename the included `env.txt` file to `.env`:
+Create a `.env.local` file in the root directory and add:
 
-```bash
-mv env.txt .env
+```env
+ANTHROPIC_API_KEY=your_api_key_here
 ```
 
-Then edit the file and replace:
-
-```
-OPENROUTERS_API_KEY = "API KEY HERE"
-```
-
-with your actual [OpenRouter](https://openrouter.ai/) API key.
-
----
-
-### 4. Start the development server
+### 4 — Run the Development Server
 
 ```bash
 npm run dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000) in your browser.
+Visit:
+
+```txt
+http://localhost:3000
+```
 
 ---
 
-## 📂 Project Structure
+## 🧳 Deployment
 
-\`\`\`
+ClauseLens can be deployed on any Node.js-compatible hosting platform, but **Vercel** is recommended.
+
+### Deploy on Vercel
+
+1. Push your project to GitHub
+2. Import the repository into Vercel
+3. Add `ANTHROPIC_API_KEY` in:
+
+   * Project Settings → Environment Variables
+4. Deploy the project
+
+---
+
+## 📁 Project Structure
+
+```txt
 src/
 ├── app/
-│   ├── Components/
-│   │   └── Chat/CoverLetter/
-│   │       ├── CoverInput.js       # User form
-│   │       ├── CoverShow.js        # Output display
-│   │       ├── Uploader.js         # Upload CV
-│   │       └── ActionButtons.js    # Copy/Download/etc
-│   ├── utils/
-│   │   ├── extractText.js          # In-browser PDF/DOCX parsing
-│   │   ├── generatePDF.js
-│   │   └── generateDOCX.js
-│   └── api/Chat/Cover/route.js     # API route calling OpenRouter
-\`\`\`
+│   ├── components/
+│   │   ├── Upload/
+│   │   ├── Analysis/
+│   │   ├── Report/
+│   │   └── UI/
+│   ├── api/
+│   │   └── analyze/route.js
+│   └── utils/
+│       ├── extractText.js
+│       ├── compareContracts.js
+│       └── riskAnalysis.js
+```
+
+---
+
+## 👥 Team
+
+| Name      | Role                                  |
+| --------- | ------------------------------------- |
+| Amanullah | Architecture, AI pipeline, deployment |
+| Fahad     | API integration, backend logic        |
+| Khizra    | File upload, PDF/DOCX parsing         |
+| Sehr      | UI/UX design, landing page            |
+| Shafia    | Documentation, product communication  |
 
 ---
 
 ## 🧠 Notes
 
-- 🔐 CV file parsing is 100% in-browser — your data stays local.
-- 📡 AI generation uses the OpenRouter API. You must provide an API key via `.env`.
-- 📄 PDF and DOCX downloads are **editable and selectable**, not screenshots.
-- 🧼 Includes graceful error handling and toast notifications.
-- 🧪 If a file fails to parse, users are informed and asked to paste CV text manually.
-
----
-
-## 🧳 Deploying
-
-You can deploy on any Node.js-compatible host, but **Vercel** is recommended:
-
-```bash
-npm run build
-npm start
-```
-
-To deploy on [Vercel](https://vercel.com/new):
-
-1. Push your project to GitHub
-2. Import your repo into Vercel
-3. Set `OPENROUTERS_API_KEY` in Project Settings → Environment Variables
-
----
-
-## 💡 Why Lettersmith?
-
-Writing personalized cover letters is painful. Lettersmith AI removes the friction by giving you high-quality drafts that still feel **yours** — with just a few clicks.
+* No user authentication required
+* No contract data is permanently stored
+* Files are processed in-memory only
+* Designed for hackathons, legal-tech demos, and rapid contract analysis
 
 ---
 
 ## 📬 License
 
-MIT — Free to use, fork, and improve.
+MIT — Free to use, modify, and improve.
