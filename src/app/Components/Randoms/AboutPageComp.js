@@ -66,7 +66,6 @@ const Particles = () => (
     ))}
   </div>
 );
-
 /* ─── marquee ─── */
 const MARQUEE_ITEMS = [
   "Zero Data Stored", "AI-Powered", "CRITICAL Detection", "MODERATE Risk",
