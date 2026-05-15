@@ -1,96 +1,86 @@
-# Blueprint Theme – The Soul of ClauseLens
+# Theme: "Neon Green / Renderforest Style" – Dark & Vibrant, Professional with Edge
 
-## The Core Idea
+## The Soul
 
-Blueprint transforms a contract comparison tool into something that feels like an engineer’s or architect’s workbench. It says: _we measure, we inspect, we leave nothing to chance._ It’s precise, analytical, and just a little bit playful—but never at the cost of clarity. The user feels like they’re looking at a living schematic, not a generic SaaS dashboard.
+Think Renderforest, Linear, or modern developer tools – deep black or near-black backgrounds, rich electric green as the primary accent, clean typography, and subtle glow effects. It’s dark mode first, but light mode is crisp and high contrast. This theme feels powerful, futuristic, and slightly mysterious – like you’re analyzing contracts from a cyberpunk command center. Yet it remains perfectly readable and serious enough for legal work.
+
+**No goofiness. No squiggles. Just striking color contrast and a premium, confident aesthetic.**
 
 ---
 
 ## The Mood
 
-- **Calm precision** – The grid and cyan lines create a sense of order. Nothing floats; everything sits on a measured plane.
-- **Quiet confidence** – No heavy shadows, no flashy gradients. Just clean borders, straight lines, and a consistent accent colour that says “I know what I’m doing.”
-- **Slight technical romance** – Monospace typefaces and stamp‑like risk badges hint at old drafting tables and typewriters, but the layout is modern and responsive. It feels both nostalgic and futuristic.
-- **Risk that jumps out** – When something is critical, it looks like a literal red stamp slapped onto the document. No mistaking it.
+- **Bold & modern** – Black and green says “tech native,” “startup energy,” but also “precision.”
+- **Calmly intense** – The darkness recedes, letting the green accents and risk colors jump forward. You focus on what matters.
+- **Slightly cinematic** – Soft glows and gradients give depth without being distracting.
+- **Trustworthy but not boring** – The green says “growth,” “positive action,” while red/orange handle risks aggressively.
 
 ---
 
-## Colour Story
+## Color Story
 
-### Light Mode (Paper Blueprint)
+### Dark Mode (Primary)
 
-- Background is off‑white, like old drafting paper. A subtle grid of cyan dots or lines sits underneath everything – you see it, but it never competes with content.
-- Cards and panels are pure white with a thin cyan border. They look like cut‑out paper notes pinned onto the blueprint.
-- Text is dark slate – very high contrast, easy to read for long legal paragraphs.
-- Cyan is used sparingly: borders, buttons, icons, and active states. It’s the “ink” of the blueprint.
+- Background: **Almost black** – `#0a0a0a` or `#0c0f0c` (very dark, slightly green tint).
+- Cards / panels: **Slightly lifted** – `#111411` or `#141814` with a subtle border (`#2a2e2a`).
+- Primary accent: **Electric green** – `#00ff88` or `#2ecc71` (vibrant but not radioactive).
+- Secondary accent: **Neon blue** (`#0088ff`) for neutral actions, or **amber** for warnings.
+- Text: **White** (`#ededed`) for primary, **grey** (`#888888`) for secondary.
+- Risk colors: Critical → **Neon red** (`#ff3366`), Moderate → **Amber** (`#ffaa00`), Minor → **Muted green** (`#88ff88` or keep electric green but softer).
 
-### Dark Mode (Light Table / Negative Blueprint)
+### Light Mode (Optional but must exist)
 
-- Deep navy background (`#0a1128`) – like looking at a blueprint on a backlit light table.
-- The grid glows faintly cyan, adding depth without clutter.
-- Cards are slightly lighter navy, again with cyan borders – but now the border can have a very subtle glow on hover.
-- Text becomes light grey, almost white. Risk colours adjust to neon versions – red glows, amber stands out, lime is clearly minor.
-- The dark mode feels like a high‑tech analysis station, yet retains the same structural “blueprint” identity.
+- Background: **Off-white** (`#f5f7f5`) with **very light green tint**.
+- Cards: **White** with subtle green border (`#d0e6d0`).
+- Primary accent: **Deep green** (`#008844`) for contrast.
+- Text: **Dark grey** (`#222222`).
+- Still modern, clean, and high contrast – no “paper” feel, more like a bright terminal.
 
-### Risk Colours – The Stamps
+---
 
-Risk levels are **never** soft pastels or rounded pills. They are hard‑edged, uppercase, slightly rotated, and look like rubber stamps.
+## Visual Elements
 
-- **CRITICAL** – Bold red, like a rejection stamp.
-- **MODERATE** – Orange/amber – a caution stamp.
-- **MINOR** – Yellow‑green – an “info” stamp.  
-  In dark mode, these colours become slightly neon to stay legible against dark blue.
+- **Glow effects** – On hover or focus, green elements emit a soft `box-shadow` or `filter: drop-shadow` in green. Very subtle – 4–8px blur.
+- **Gradients** – Use sparingly: a very dark green-to-black gradient on the background or on primary buttons.
+- **Borders** – Thin (`1px`), mostly `#2a2e2a`. Active cards get a green left border (`4px solid #00ff88`).
+- **Cards** – No sharp corners; `rounded-lg` (8–12px). No heavy shadows – just a subtle elevation or a 1px border.
+- **Icons** – Outline style, thick stroke, green when active.
 
 ---
 
 ## Typography
 
-- **Body text** – A clean, neutral sans‑serif (Inter or similar). It disappears into the background, letting the content speak.
-- **Code / IDs / section references** – A monospace font (JetBrains Mono or Fira Code). This signals “this is a precise identifier, like a part number.”
-- **Risk stamps** – A different monospace (Courier New or similar typewriter face). It feels like a physical stamp was pressed onto the document. Slightly irregular, slightly analogue.
+- **Sans-serif all the way** – Inter, SF Pro, or Plus Jakarta Sans. Clean, geometric, modern.
+- **Headings** – Bold, letter-spacing tight.
+- **Risk badges** – Pill-shaped, uppercase, bold, with a subtle green or red glow behind them. Not stamps, not ribbons. Just crisp, modern pills with high color saturation.
 
 ---
 
-## Layout & Space
+## Interactions
 
-- Generous white/negative space. The grid keeps things aligned, but elements breathe.
-- Cards are separated by the grid – you can see the blueprint lines between them.
-- Borders are thin (1px) and always present. Nothing uses box‑shadow except a very rare “offset” effect for hover states (like a hard shadow that mimics a second border).
-- Buttons are outlined cyan by default; on hover they fill with cyan and invert text colour – like the ink spilling in.
-- The upload zone has a dashed cyan border – unfinished, waiting for your document to be placed.
-
----
-
-## Interactions & Micro‑feel
-
-- **Hover on a change card** – The cyan border thickens to 2px. No other movement. It feels like you’re drawing a ruler next to it.
-- **Click a change** – A detail panel slides from the right. It has a cyan vertical bar on the left edge, like a margin note. Inside, the explanation uses the same monospace for section names.
-- **Loading state** – A pulsing cyan line sweeps across the top of the card, like a plotter drawing. Or a simple skeleton with a cyan shimmer.
-- **Drag over upload zone** – The dashed border becomes solid, and a faint cyan tint fills the zone. It says “drop here – we’ll measure it.”
+- **Hover on change cards** – The card gains a green glow border, scale up by 0.5% (barely noticeable), and the risk badge intensifies in color.
+- **Focus states** – Green outline, no blue default.
+- **Upload zone** – Dashed green border that fills with very dark green on drag over.
+- **Loading** – A thin green shimmer line sweeping across the card, or a pulsing green dot.
+- **Buttons** – Outlined green default; solid green on hover with black text (high contrast).
 
 ---
 
 ## Light & Dark Relationship
 
-Light and dark modes are **two sides of the same blueprint** – not entirely different themes.
-
-- Light mode = white paper, cyan ink, red stamps.
-- Dark mode = backlit film, glowing cyan, neon stamps.  
-  Switching between them keeps the same structural layout, same border weights, same stamp styling. The user doesn’t get disoriented.
+Dark mode is the hero. Light mode is the polite cousin – still green-accented, still modern, but higher brightness for daytime use. Both use the same border radii, spacing, and component shapes. Switching doesn’t disorient.
 
 ---
 
-## What This Theme Avoids
+## What This Theme Rejects
 
-- **No glassmorphism** – No blurs, no translucent overlapping cards. Blueprints are opaque and exact.
-- **No big rounded corners** – Sharp or slightly rounded (4‑6px) only. Nothing pill‑shaped except maybe a “new” indicator.
-- **No soft shadows** – Shadows would make elements feel like they’re floating off the blueprint. Everything stays flat on the plane.
-- **No emojis or fun illustrations** – Icons are line‑art, preferably compass, ruler, magnifying glass, stamp. No smileys or abstract shapes.
+- Overly playful elements (squiggles, random rotations, emojis).
+- Glassmorphism (no heavy blurs – they hurt readability).
+- Multiple accent colors fighting for attention (green leads; blue/amber only when necessary).
+- Shadows that mimic physical paper (everything stays flat-ish with glow).
 
 ---
 
-## Why This Works for ClauseLens
+## Why It Works for ClauseLens
 
-ClauseLens analyses contracts – legal documents that demand precision. The blueprint theme visually reinforces that you are scrutinising every detail, measuring every change. It elevates the tool from “another AI wrapper” to a serious instrument. Yet the stamps and the grid add just enough character that the user enjoys using it, not just endures it.
-
-Engineers and lawyers both respect a well‑drawn blueprint. That’s the vibe.
+Legal analysis needs focus. A dark background reduces eye strain during long sessions. The electric green draws attention to actionable elements (upload, analyze, expand) while risk red stays unmistakable. It feels like a serious tool that also happens to look gorgeous – the kind of app you’d show off on Twitter or Product Hunt. It’s between minimalist and playful: professional but with personality, dark but welcoming.

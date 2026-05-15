@@ -3,84 +3,142 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Sun, Moon, Zap } from "lucide-react";
 
 const navItems = [
   { label: "Home", href: "/" },
   { label: "About", href: "/About" },
   { label: "ClauseLens", href: "/ClauseLens" },
-  // { label: "Cover Maker", href: "/CoverLetter" },
   { label: "CV Maker", href: "/CVmaker" },
 ];
 
 const Navbar = () => {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true); // Dark mode first
+
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+    // Full theming will be added later
+  };
+
+  // Theme styles: Dark mode hero, Light mode polite cousin
+  const containerClass = isDarkMode
+    ? "bg-[#0a0a0a] border-b border-[#2a2e2a] text-white"
+    : "bg-[#f5f7f5] border-b border-[#d0e6d0] text-gray-900";
+
+  const logoClass = isDarkMode
+    ? "bg-[#111411] border border-[#2a2e2a] text-[#00ff88] shadow-[0_0_8px_rgba(0,255,136,0.3)]"
+    : "bg-white border border-[#008844] text-[#008844] shadow-none";
+
+  const getNavLinkClass = (isActive) => {
+    if (isActive) {
+      return isDarkMode
+        ? "bg-[#00ff88] text-black border border-[#00ff88] shadow-[0_0_8px_rgba(0,255,136,0.4)]"
+        : "bg-[#008844] text-white border border-[#008844] shadow-none";
+    }
+    return isDarkMode
+      ? "border border-[#2a2e2a] text-gray-300 hover:bg-[#00ff88] hover:text-black hover:border-[#00ff88] hover:shadow-[0_0_8px_rgba(0,255,136,0.3)] transition-all"
+      : "border border-[#c0dcc0] text-gray-700 hover:bg-[#008844] hover:text-white hover:border-[#008844] transition-all";
+  };
+
+  const getMobileLinkClass = (isActive) => {
+    if (isActive) {
+      return isDarkMode
+        ? "bg-[#00ff88] text-black border border-[#00ff88]"
+        : "bg-[#008844] text-white border border-[#008844]";
+    }
+    return isDarkMode
+      ? "border border-[#2a2e2a] text-gray-300 hover:bg-[#00ff88] hover:text-black hover:border-[#00ff88]"
+      : "border border-[#c0dcc0] text-gray-700 hover:bg-[#008844] hover:text-white hover:border-[#008844]";
+  };
+
+  const toggleButtonClass = isDarkMode
+    ? "border border-[#2a2e2a] text-[#00ff88] hover:bg-[#00ff88] hover:text-black hover:border-[#00ff88] hover:shadow-[0_0_8px_rgba(0,255,136,0.3)]"
+    : "border border-[#c0dcc0] text-[#008844] hover:bg-[#008844] hover:text-white hover:border-[#008844]";
 
   return (
     <motion.nav
-      initial={{ y: -80, opacity: 0 }}
+      initial={{ y: -60, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.7, ease: "easeOut" }}
-      className="w-full px-6 py-4 bg-black text-white border-b border-neutral-800 shadow-[0_0_10px_rgba(255,255,255,0.06)]"
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className={`w-full px-6 py-4 transition-colors duration-200 ${containerClass}`}
     >
       <div className="flex justify-between items-center">
-        <Link href="/" className="flex items-center gap-3 cursor-pointer">
-          <motion.div whileHover={{ scale: 1.04 }}>
-            <div className="w-9 h-9 bg-white text-black flex items-center justify-center text-lg font-bold rounded-lg border border-neutral-600">
-              C
-            </div>
+        {/* Logo with Zap icon - but clean, no goofiness */}
+        <Link href="/" className="flex items-center gap-3 cursor-pointer group">
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            transition={{ duration: 0.2 }}
+            className={`w-9 h-9 flex items-center justify-center text-lg font-bold rounded-lg transition-all ${logoClass}`}
+          >
+            <Zap className="w-5 h-5" />
           </motion.div>
-          <span className="font-bold tracking-tight text-white text-lg sm:text-xl hidden min-[281px]:inline">
+          <span className="font-semibold tracking-tight text-inherit text-lg sm:text-xl">
             ClauseLens
           </span>
         </Link>
 
-        <div className="sm:hidden">
-          <button onClick={() => setMenuOpen(!menuOpen)}>
-            {menuOpen ? (
-              <X className="w-6 h-6" />
+        {/* Right side: desktop nav + toggle + mobile button */}
+        <div className="flex items-center gap-3">
+          <div className="hidden sm:flex gap-2 sm:gap-3">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link key={item.href} href={item.href}>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ duration: 0.15 }}
+                    className={`px-4 py-2 font-medium text-sm sm:text-base rounded-lg transition-all ${getNavLinkClass(
+                      isActive,
+                    )}`}
+                  >
+                    {item.label}
+                  </motion.button>
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* Theme toggle */}
+          <button
+            onClick={toggleTheme}
+            className={`p-2 rounded-lg transition-all ${toggleButtonClass}`}
+            aria-label="Toggle theme"
+          >
+            {isDarkMode ? (
+              <Sun className="w-5 h-5" />
             ) : (
-              <Menu className="w-6 h-6" />
+              <Moon className="w-5 h-5" />
             )}
           </button>
-        </div>
 
-        <div className="hidden sm:flex gap-2 sm:gap-3">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <Link key={item.href} href={item.href}>
-                <motion.button
-                  whileHover={{
-                    scale: 1.07,
-                    backgroundColor: "rgba(6,182,212,0.3)",
-                    color: "#fff",
-                  }}
-                  whileTap={{ scale: 0.96 }}
-                  transition={{ duration: 0.1 }}
-                  className={`px-4 py-2 border-2 font-medium text-sm sm:text-base tracking-wide rounded-lg transition-all hover:shadow-lg cursor-pointer
-                  ${
-                    isActive
-                      ? "border-white bg-cyan-500 text-black"
-                      : "border-white text-white"
-                  }`}
-                >
-                  {item.label}
-                </motion.button>
-              </Link>
-            );
-          })}
+          {/* Mobile menu button */}
+          <div className="sm:hidden">
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className={`p-2 rounded-lg border ${isDarkMode ? "border-[#2a2e2a] text-[#00ff88]" : "border-[#c0dcc0] text-[#008844]"}`}
+            >
+              {menuOpen ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
+      {/* Mobile dropdown – clean, no squiggles */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="flex flex-col sm:hidden mt-4 space-y-2"
+            transition={{ duration: 0.2 }}
+            className="flex flex-col sm:hidden mt-5 space-y-2"
           >
             {navItems.map((item) => {
               const isActive = pathname === item.href;
@@ -91,14 +149,11 @@ const Navbar = () => {
                   onClick={() => setMenuOpen(false)}
                 >
                   <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className={`w-full text-left px-4 py-2 border-2 rounded-lg font-medium tracking-wide
-                    ${
-                      isActive
-                        ? "border-white bg-cyan-500 text-black"
-                        : "border-white text-white"
-                    }`}
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.98 }}
+                    className={`w-full text-left px-4 py-2.5 rounded-lg font-medium transition-all ${getMobileLinkClass(
+                      isActive,
+                    )}`}
                   >
                     {item.label}
                   </motion.button>
