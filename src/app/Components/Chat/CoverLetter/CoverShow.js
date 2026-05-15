@@ -94,6 +94,9 @@ const Show = ({ data, loading }) => {
         )}
       </AnimatePresence>
     </motion.div>
+    // <div className="w-full h-full border border-neutral-300 rounded-lg p-4 flex flex-col bg-neutral-950 text-white overflow-y-auto">
+    //   asdfsx
+    //   </div>
   );
 };
 
