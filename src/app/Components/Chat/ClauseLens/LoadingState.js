@@ -3,74 +3,79 @@
 import React from "react";
 import { motion } from "framer-motion";
 
-const LoadingDots = () => (
-  <div className="text-cyan-400 text-sm font-mono tracking-wide flex gap-1 items-center">
-    <motion.span
-      animate={{ opacity: [0.2, 1, 0.2] }}
-      transition={{ duration: 1.2, repeat: Infinity }}
-    >
-      •
-    </motion.span>
-    <motion.span
-      animate={{ opacity: [0.2, 1, 0.2] }}
-      transition={{ duration: 1.2, repeat: Infinity, delay: 0.2 }}
-    >
-      •
-    </motion.span>
-    <motion.span
-      animate={{ opacity: [0.2, 1, 0.2] }}
-      transition={{ duration: 1.2, repeat: Infinity, delay: 0.4 }}
-    >
-      •
-    </motion.span>
-    <span className="ml-2">Analyzing Contract</span>
-  </div>
-);
-
-const SkeletonLine = () => (
+const Shimmer = ({ w = "full", delay = 0 }) => (
   <motion.div
     animate={{ opacity: [0.3, 0.6, 0.3] }}
-    transition={{ duration: 2, repeat: Infinity }}
-    className="h-3 bg-neutral-700 rounded-full w-full mb-3"
+    transition={{ duration: 1.8, repeat: Infinity, delay }}
+    className={`h-3 rounded-full bg-[#1e221e] w-${w}`}
   />
 );
 
-const LoadingState = () => {
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
-      className="w-full h-full flex flex-col gap-4"
-    >
-      <div className="flex items-center gap-3 mb-6">
-        <LoadingDots />
+const LoadingState = () => (
+  <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    className="space-y-6 py-4"
+  >
+    {/* Status */}
+    <div className="flex items-center gap-3 px-1">
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ duration: 1.4, repeat: Infinity, ease: "linear" }}
+        className="w-5 h-5 border-2 border-[#00ff88]/20 border-t-[#00ff88] rounded-full flex-shrink-0"
+      />
+      <div className="space-y-1">
+        <p className="text-sm font-semibold text-white">Analyzing contracts…</p>
+        <p className="text-xs text-neutral-500">
+          Detecting changes and assessing risk levels
+        </p>
       </div>
+    </div>
 
-      {/* Skeleton Changes */}
-      <div className="space-y-4">
-        {[1, 2, 3].map((i) => (
+    {/* Skeleton risk bar */}
+    <div className="rounded-xl border border-[#2a2e2a] bg-[#111411] overflow-hidden">
+      <div className="px-5 py-4 border-b border-[#2a2e2a] flex items-center justify-between">
+        <div className="space-y-2 flex-1 mr-8">
+          <Shimmer w="32" />
+          <Shimmer w="48" delay={0.1} />
+        </div>
+        <div className="w-20 h-8 rounded-xl bg-[#1e221e] animate-pulse" />
+      </div>
+      <div className="grid grid-cols-3 divide-x divide-[#2a2e2a]">
+        {[0, 0.1, 0.2].map((d, i) => (
+          <div key={i} className="flex flex-col items-center py-4 gap-2">
+            <div className="w-8 h-7 rounded-lg bg-[#1e221e] animate-pulse" />
+            <div className="w-12 h-2.5 rounded-full bg-[#1e221e] animate-pulse" />
+          </div>
+        ))}
+      </div>
+    </div>
+
+    {/* Skeleton cards */}
+    <div className="rounded-xl border border-[#2a2e2a] bg-[#0c0f0c] overflow-hidden">
+      <div className="px-5 py-4 border-b border-[#2a2e2a]">
+        <Shimmer w="28" />
+      </div>
+      <div className="p-4 space-y-3">
+        {[0, 0.08, 0.16].map((d, i) => (
           <motion.div
             key={i}
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
-            className="border border-neutral-700 rounded-lg p-4 space-y-3"
+            transition={{ delay: d + 0.2 }}
+            className="rounded-xl border border-[#2a2e2a] p-4 space-y-2.5"
           >
-            <div className="flex justify-between items-start">
-              <div className="flex-1">
-                <SkeletonLine />
-              </div>
-              <div className="w-20 h-6 bg-neutral-700 rounded-full" />
+            <div className="flex gap-2">
+              <Shimmer w="24" delay={d} />
+              <div className="w-16 h-3 rounded-full bg-[#1e221e]" />
             </div>
-            <SkeletonLine />
-            <SkeletonLine />
+            <Shimmer w="full" delay={d + 0.05} />
+            <Shimmer w="3/4" delay={d + 0.1} />
           </motion.div>
         ))}
       </div>
-    </motion.div>
-  );
-};
+    </div>
+  </motion.div>
+);
 
 export default LoadingState;

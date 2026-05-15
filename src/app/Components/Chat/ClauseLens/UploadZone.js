@@ -2,222 +2,230 @@
 
 import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, X } from "lucide-react";
+import { Upload, X, FileText, CheckCircle } from "lucide-react";
 import { toast } from "react-toastify";
 import { parseFile } from "@/lib/parseFile";
 
+const UploadBox = ({ type, label, file, loading, onSelect, onClear }) => {
+  const inputRef = useRef(null);
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const f = e.dataTransfer.files[0];
+    if (f) onSelect(type, f);
+  };
+
+  return (
+    <motion.div
+      whileHover={{ borderColor: "rgba(0,255,136,0.4)" }}
+      onDragOver={(e) => e.preventDefault()}
+      onDrop={handleDrop}
+      onClick={() => !file && inputRef.current?.click()}
+      className={`relative w-full rounded-xl border-2 border-dashed transition-all cursor-pointer p-5
+        ${file ? "border-[#00ff88]/40 bg-[#00ff88]/5 cursor-default" : "border-[#2a2e2a] bg-[#111411] hover:bg-[#141814]"}`}
+    >
+      <input
+        ref={inputRef}
+        type="file"
+        accept=".pdf,.docx,.txt"
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) onSelect(type, f);
+        }}
+        className="hidden"
+      />
+
+      <AnimatePresence mode="wait">
+        {loading ? (
+          <motion.div
+            key="loading"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="flex items-center gap-3 py-2"
+          >
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
+              className="w-6 h-6 border-2 border-[#00ff88]/20 border-t-[#00ff88] rounded-full flex-shrink-0"
+            />
+            <p className="text-sm text-neutral-400">Parsing file...</p>
+          </motion.div>
+        ) : file ? (
+          <motion.div
+            key="file"
+            initial={{ opacity: 0, scale: 0.97 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex items-center gap-3"
+          >
+            <div className="w-9 h-9 rounded-lg bg-[#00ff88]/10 flex items-center justify-center flex-shrink-0">
+              <CheckCircle className="w-5 h-5 text-[#00ff88]" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-white truncate">
+                {file.name}
+              </p>
+              <p className="text-xs text-neutral-500">
+                {(file.size / 1024).toFixed(1)} KB · {label}
+              </p>
+            </div>
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={(e) => {
+                e.stopPropagation();
+                onClear(type);
+              }}
+              className="p-1.5 rounded-lg hover:bg-red-500/10 transition-colors flex-shrink-0"
+            >
+              <X className="w-4 h-4 text-neutral-400 hover:text-red-400" />
+            </motion.button>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="empty"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex items-center gap-3 py-1"
+          >
+            <div className="w-9 h-9 rounded-lg bg-[#1a1e1a] border border-[#2a2e2a] flex items-center justify-center flex-shrink-0">
+              <FileText className="w-5 h-5 text-neutral-500" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-white">{label}</p>
+              <p className="text-xs text-neutral-500">
+                PDF, DOCX or TXT · Max 10MB
+              </p>
+            </div>
+            <div className="ml-auto">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#2a2e2a] text-xs text-neutral-400">
+                <Upload className="w-3 h-3" /> Browse
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+};
+
 const UploadZone = ({ onFilesSelected }) => {
   const [files, setFiles] = useState({ original: null, revised: null });
-  const [fileContent, setFileContent] = useState({ original: null, revised: null });
+  const [fileContent, setFileContent] = useState({
+    original: null,
+    revised: null,
+  });
   const [loading, setLoading] = useState({ original: false, revised: false });
-  const fileInputRef = useRef({ original: null, revised: null });
 
   const handleFileSelect = async (type, file) => {
-    if (!file) return;
-
-    // Check file type
     const validTypes = [
       "application/pdf",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
       "text/plain",
     ];
-
     if (!validTypes.includes(file.type)) {
-      toast.error("❌ Only PDF, DOCX, and TXT files are supported");
+      toast.error("❌ Only PDF, DOCX, and TXT files supported");
       return;
     }
-
-    // Check file size (10MB)
     if (file.size > 10 * 1024 * 1024) {
-      toast.error("❌ File size exceeds 10MB limit");
+      toast.error("❌ File exceeds 10MB limit");
       return;
     }
 
-    setLoading((prev) => ({ ...prev, [type]: true }));
-    setFiles((prev) => ({ ...prev, [type]: file }));
+    setLoading((p) => ({ ...p, [type]: true }));
+    setFiles((p) => ({ ...p, [type]: file }));
 
     try {
       const result = await parseFile(file);
       if (result.error) {
         toast.error(result.error);
-        setFiles((prev) => ({ ...prev, [type]: null }));
-      } else {
-        setFileContent((prev) => ({ ...prev, [type]: result.text }));
-        toast.success(`✅ ${type === "original" ? "Original" : "Revised"} document loaded`);
-        
-        // Auto-trigger if both files are loaded
-        if ((type === "original" && fileContent.revised) || (type === "revised" && fileContent.original)) {
-          setTimeout(() => {
-            onFilesSelected({
-              original: type === "original" ? result.text : fileContent.original,
-              revised: type === "revised" ? result.text : fileContent.revised,
-            });
-          }, 300);
-        }
+        setFiles((p) => ({ ...p, [type]: null }));
+        return;
       }
-    } catch (error) {
-      console.error("Parse error:", error);
+      const newContent = { ...fileContent, [type]: result.text };
+      setFileContent(newContent);
+      toast.success(`✅ ${label(type)} loaded`);
+
+      const other = type === "original" ? "revised" : "original";
+      if (newContent[other]) {
+        setTimeout(
+          () =>
+            onFilesSelected({
+              original: newContent.original,
+              revised: newContent.revised,
+            }),
+          300,
+        );
+      }
+    } catch {
       toast.error("Failed to parse file");
-      setFiles((prev) => ({ ...prev, [type]: null }));
+      setFiles((p) => ({ ...p, [type]: null }));
     } finally {
-      setLoading((prev) => ({ ...prev, [type]: false }));
+      setLoading((p) => ({ ...p, [type]: false }));
     }
-  };
-
-  const handleDrop = (e, type) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const file = e.dataTransfer.files[0];
-    handleFileSelect(type, file);
-  };
-
-  const handleInputChange = (type, e) => {
-    const file = e.target.files?.[0];
-    if (file) handleFileSelect(type, file);
   };
 
   const clearFile = (type) => {
-    setFiles((prev) => ({ ...prev, [type]: null }));
-    setFileContent((prev) => ({ ...prev, [type]: null }));
-    if (fileInputRef.current[type]) {
-      fileInputRef.current[type].value = "";
-    }
+    setFiles((p) => ({ ...p, [type]: null }));
+    setFileContent((p) => ({ ...p, [type]: null }));
   };
 
-  const UploadBox = ({ type, label }) => (
-    <motion.div
-      initial={{ opacity: 0, y: 15 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      onDragOver={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-      }}
-      onDrop={(e) => handleDrop(e, type)}
-      className="w-full flex flex-col border-2 border-dashed border-neutral-600 rounded-lg p-6 bg-neutral-900/50 hover:border-cyan-500/50 transition-colors cursor-pointer group"
-      onClick={() => fileInputRef.current[type]?.click()}
-    >
-      <input
-        ref={(el) => {
-          fileInputRef.current[type] = el;
-        }}
-        type="file"
-        accept=".pdf,.docx,.txt"
-        onChange={(e) => handleInputChange(type, e)}
-        className="hidden"
-      />
+  const label = (type) =>
+    type === "original" ? "Original Document" : "Revised Document";
 
-      {files[type] ? (
-        <motion.div
-          key="file"
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="flex items-center justify-between w-full"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-cyan-500/20 rounded-lg flex items-center justify-center">
-              <Upload className="w-5 h-5 text-cyan-400" />
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-medium text-white truncate">
-                {files[type].name}
-              </p>
-              <p className="text-xs text-neutral-400">
-                {(files[type].size / 1024).toFixed(1)} KB
-              </p>
-            </div>
-          </div>
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={(e) => {
-              e.stopPropagation();
-              clearFile(type);
-            }}
-            className="p-2 hover:bg-neutral-800 rounded-lg transition-colors"
-          >
-            <X className="w-4 h-4 text-neutral-400 hover:text-red-400" />
-          </motion.button>
-        </motion.div>
-      ) : loading[type] ? (
-        <motion.div
-          key="loading"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="flex flex-col items-center gap-2"
-        >
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-            className="w-8 h-8 border-2 border-cyan-400/30 border-t-cyan-400 rounded-full"
-          />
-          <p className="text-sm text-neutral-400">Parsing file...</p>
-        </motion.div>
-      ) : (
-        <motion.div
-          key="empty"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="flex flex-col items-center gap-3"
-        >
-          <div className="w-12 h-12 bg-neutral-800 rounded-lg flex items-center justify-center group-hover:bg-neutral-700 transition-colors">
-            <Upload className="w-6 h-6 text-neutral-400 group-hover:text-cyan-400 transition-colors" />
-          </div>
-          <div className="text-center">
-            <p className="text-sm font-medium text-white">{label}</p>
-            <p className="text-xs text-neutral-400 mt-1">
-              Drag & drop or click to upload
-            </p>
-            <p className="text-xs text-neutral-500 mt-1">PDF, DOCX, TXT • Max 10MB</p>
-          </div>
-        </motion.div>
-      )}
-    </motion.div>
-  );
+  const bothReady = fileContent.original && fileContent.revised;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 15 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="w-full h-full border border-neutral-300 rounded-lg bg-black text-white p-6 flex flex-col"
-    >
-      <div className="mb-6 border-b border-neutral-700 pb-4">
-        <h2 className="text-lg font-semibold">Contract Comparison</h2>
-        <p className="text-xs text-neutral-400 mt-1">
-          Upload two versions of your contract to detect changes and assess risk levels.
-        </p>
+    <div className="w-full space-y-4">
+      <UploadBox
+        type="original"
+        label="Original Contract"
+        file={files.original}
+        loading={loading.original}
+        onSelect={handleFileSelect}
+        onClear={clearFile}
+      />
+
+      {/* Divider */}
+      <div className="flex items-center gap-3">
+        <div className="flex-1 h-px bg-[#2a2e2a]" />
+        <span className="text-xs text-neutral-600 font-mono">vs</span>
+        <div className="flex-1 h-px bg-[#2a2e2a]" />
       </div>
 
-      <div className="flex-1 flex flex-col gap-6">
-        <div className="flex-1 flex flex-col gap-4">
-          <label className="text-sm font-medium text-neutral-300">Original Document</label>
-          <UploadBox type="original" label="Original Document" />
-        </div>
+      <UploadBox
+        type="revised"
+        label="Revised Contract"
+        file={files.revised}
+        loading={loading.revised}
+        onSelect={handleFileSelect}
+        onClear={clearFile}
+      />
 
-        <div className="flex-1 flex flex-col gap-4">
-          <label className="text-sm font-medium text-neutral-300">Revised Document</label>
-          <UploadBox type="revised" label="Revised Document" />
-        </div>
-
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() =>
-            fileContent.original &&
-            fileContent.revised &&
-            onFilesSelected({
-              original: fileContent.original,
-              revised: fileContent.revised,
-            })
-          }
-          disabled={!fileContent.original || !fileContent.revised}
-          className="w-full py-3 px-4 bg-cyan-500 text-black font-semibold rounded-lg hover:bg-cyan-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-auto"
-        >
-          Analyze Documents
-        </motion.button>
-      </div>
-    </motion.div>
+      {/* Analyze button */}
+      <motion.button
+        whileHover={{ scale: bothReady ? 1.02 : 1 }}
+        whileTap={{ scale: bothReady ? 0.98 : 1 }}
+        onClick={() =>
+          bothReady &&
+          onFilesSelected({
+            original: fileContent.original,
+            revised: fileContent.revised,
+          })
+        }
+        disabled={!bothReady}
+        className={`w-full py-3.5 rounded-xl font-semibold text-sm transition-all mt-2
+          ${
+            bothReady
+              ? "bg-[#00ff88] text-black hover:bg-[#00dd77] shadow-[0_0_20px_rgba(0,255,136,0.2)]"
+              : "bg-[#111411] text-neutral-600 border border-[#2a2e2a] cursor-not-allowed"
+          }`}
+      >
+        {bothReady
+          ? "⚡ Analyze Documents"
+          : "Upload both documents to continue"}
+      </motion.button>
+    </div>
   );
 };
 

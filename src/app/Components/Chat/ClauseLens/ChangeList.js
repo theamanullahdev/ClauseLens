@@ -4,77 +4,71 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import ChangeCard from "./ChangeCard";
 
-const ChangeList = ({ data, onFilterChange }) => {
+const FILTERS = [
+  { label: "All", value: "ALL" },
+  { label: "Critical", value: "CRITICAL" },
+  { label: "Moderate", value: "MODERATE" },
+  { label: "Minor", value: "MINOR" },
+];
+
+const ChangeList = ({ data }) => {
   const [activeFilter, setActiveFilter] = useState("ALL");
-
-  const filters = [
-    { label: "All", value: "ALL" },
-    { label: "Critical", value: "CRITICAL" },
-    { label: "Moderate", value: "MODERATE" },
-    { label: "Minor", value: "MINOR" },
-  ];
-
-  // Safely handle data
   const changes = data?.changes || [];
-  const filteredChanges = changes.filter(
-    (change) => activeFilter === "ALL" || change.risk_level === activeFilter
+  const filtered = changes.filter(
+    (c) => activeFilter === "ALL" || c.risk_level === activeFilter,
   );
 
-  const handleFilterChange = (value) => {
-    setActiveFilter(value);
-    if (onFilterChange) {
-      onFilterChange(value);
-    }
-  };
+  const countFor = (v) =>
+    v === "ALL"
+      ? changes.length
+      : changes.filter((c) => c.risk_level === v).length;
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 15 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="w-full h-full border border-neutral-300 rounded-lg bg-black text-white p-6 flex flex-col"
+      transition={{ delay: 0.1 }}
+      className="w-full rounded-xl border border-[#2a2e2a] bg-[#0c0f0c] overflow-hidden"
     >
-      <div className="mb-6 border-b border-neutral-700 pb-4">
-        <h2 className="text-lg font-semibold">Detected Changes</h2>
-        <p className="text-xs text-neutral-400 mt-1">
-          {filteredChanges.length} change{filteredChanges.length !== 1 ? "s" : ""}{" "}
-          found
-        </p>
+      {/* Header + filters */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-4 border-b border-[#2a2e2a]">
+        <div>
+          <h2 className="text-sm font-semibold text-white">Detected Changes</h2>
+          <p className="text-xs text-neutral-500 mt-0.5">
+            {filtered.length} change{filtered.length !== 1 ? "s" : ""} shown
+          </p>
+        </div>
+        <div className="flex gap-1.5 flex-wrap">
+          {FILTERS.map((f) => (
+            <motion.button
+              key={f.value}
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
+              onClick={() => setActiveFilter(f.value)}
+              className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all
+                ${
+                  activeFilter === f.value
+                    ? "bg-[#00ff88] text-black"
+                    : "bg-[#1a1e1a] text-neutral-400 border border-[#2a2e2a] hover:border-[#00ff88]/30 hover:text-[#00ff88]"
+                }`}
+            >
+              {f.label}{" "}
+              <span className="opacity-60 ml-0.5">({countFor(f.value)})</span>
+            </motion.button>
+          ))}
+        </div>
       </div>
 
-      {/* Filter Buttons */}
-      <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-        {filters.map((filter) => (
-          <motion.button
-            key={filter.value}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => handleFilterChange(filter.value)}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
-              activeFilter === filter.value
-                ? "bg-cyan-500 text-black"
-                : "bg-neutral-800 text-neutral-300 hover:bg-neutral-700"
-            }`}
-          >
-            {filter.label}
-          </motion.button>
-        ))}
-      </div>
-
-      {/* Changes List */}
-      <div className="flex-1 overflow-y-auto space-y-3 pr-2 scrollbar-thin scrollbar-thumb-neutral-700 scrollbar-track-neutral-900">
-        {filteredChanges.length > 0 ? (
-          filteredChanges.map((change, index) => (
-            <ChangeCard key={change.id} change={change} index={index} />
+      {/* List */}
+      <div className="p-4 space-y-3 max-h-[60vh] overflow-y-auto scrollbar-hide">
+        {filtered.length > 0 ? (
+          filtered.map((change, i) => (
+            <ChangeCard key={change.id} change={change} index={i} />
           ))
         ) : (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex items-center justify-center h-32 text-neutral-500 text-sm"
-          >
-            No changes found in this category
-          </motion.div>
+          <div className="flex items-center justify-center h-24 text-neutral-600 text-sm">
+            No changes in this category
+          </div>
         )}
       </div>
     </motion.div>

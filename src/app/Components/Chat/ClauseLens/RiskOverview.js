@@ -4,90 +4,89 @@ import React from "react";
 import { motion } from "framer-motion";
 
 const RiskOverview = ({ data }) => {
-  const getRiskBadgeColor = (risk) => {
-    switch (risk) {
-      case "HIGH":
-        return "bg-red-500/20 text-red-400 border-red-500/30";
-      case "MODERATE":
-        return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
-      case "LOW":
-        return "bg-green-500/20 text-green-400 border-green-500/30";
-      default:
-        return "bg-neutral-500/20 text-neutral-400 border-neutral-500/30";
-    }
-  };
-
-  const getRiskIcon = (risk) => {
-    switch (risk) {
-      case "HIGH":
-        return "⚠️";
-      case "MODERATE":
-        return "⚡";
-      case "LOW":
-        return "✓";
-      default:
-        return "•";
-    }
-  };
-
-  // Count changes by risk level
   const changes = data?.changes || [];
-  const criticalCount = changes.filter(
-    (c) => c.risk_level === "CRITICAL"
-  ).length || 0;
-  const moderateCount = changes.filter(
-    (c) => c.risk_level === "MODERATE"
-  ).length || 0;
-  const minorCount = changes.filter(
-    (c) => c.risk_level === "MINOR"
-  ).length || 0;
+  const critical = changes.filter((c) => c.risk_level === "CRITICAL").length;
+  const moderate = changes.filter((c) => c.risk_level === "MODERATE").length;
+  const minor = changes.filter((c) => c.risk_level === "MINOR").length;
+
+  const riskConfig = {
+    HIGH: {
+      color: "text-red-400",
+      bg: "bg-red-500/10 border-red-500/30",
+      glow: "shadow-[0_0_12px_rgba(255,51,102,0.2)]",
+      dot: "bg-red-400",
+    },
+    MODERATE: {
+      color: "text-yellow-400",
+      bg: "bg-yellow-500/10 border-yellow-500/30",
+      glow: "shadow-[0_0_12px_rgba(255,170,0,0.2)]",
+      dot: "bg-yellow-400",
+    },
+    LOW: {
+      color: "text-[#00ff88]",
+      bg: "bg-[#00ff88]/10 border-[#00ff88]/30",
+      glow: "shadow-[0_0_12px_rgba(0,255,136,0.2)]",
+      dot: "bg-[#00ff88]",
+    },
+  };
+  const cfg = riskConfig[data.overall_risk] || riskConfig.LOW;
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: -15 }}
+      initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="w-full border border-neutral-700 rounded-lg p-6 bg-neutral-900 space-y-4"
+      className="w-full rounded-xl border border-[#2a2e2a] bg-[#111411] overflow-hidden"
     >
-      {/* Overall Risk */}
-      <div className="flex items-center justify-between">
+      {/* Top strip */}
+      <div className="flex items-center justify-between px-5 py-4 border-b border-[#2a2e2a]">
         <div>
-          <p className="text-sm text-neutral-400 mb-1">Overall Risk</p>
-          <p className="text-2xl font-bold">{data.summary || "No changes detected"}</p>
+          <p className="text-xs text-neutral-500 uppercase tracking-widest font-semibold mb-1">
+            Overall Risk
+          </p>
+          <p className="text-white font-semibold text-sm leading-snug">
+            {data.summary}
+          </p>
         </div>
         <motion.div
           whileHover={{ scale: 1.05 }}
-          className={`px-4 py-2 rounded-lg border font-semibold text-lg ${getRiskBadgeColor(
-            data.overall_risk
-          )}`}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl border font-bold text-sm ${cfg.color} ${cfg.bg} ${cfg.glow}`}
         >
-          {getRiskIcon(data.overall_risk)} {data.overall_risk}
+          <span className={`w-2 h-2 rounded-full ${cfg.dot} animate-pulse`} />
+          {data.overall_risk}
         </motion.div>
       </div>
 
-      {/* Risk Breakdown */}
-      <div className="grid grid-cols-3 gap-3 pt-4 border-t border-neutral-700">
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-center"
-        >
-          <p className="text-2xl font-bold text-red-400">{criticalCount}</p>
-          <p className="text-xs text-neutral-400 mt-1">Critical</p>
-        </motion.div>
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-center"
-        >
-          <p className="text-2xl font-bold text-yellow-400">{moderateCount}</p>
-          <p className="text-xs text-neutral-400 mt-1">Moderate</p>
-        </motion.div>
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          className="p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg text-center"
-        >
-          <p className="text-2xl font-bold text-blue-400">{minorCount}</p>
-          <p className="text-xs text-neutral-400 mt-1">Minor</p>
-        </motion.div>
+      {/* Stats row */}
+      <div className="grid grid-cols-3 divide-x divide-[#2a2e2a]">
+        {[
+          {
+            label: "Critical",
+            count: critical,
+            color: "text-red-400",
+            bg: "hover:bg-red-500/5",
+          },
+          {
+            label: "Moderate",
+            count: moderate,
+            color: "text-yellow-400",
+            bg: "hover:bg-yellow-500/5",
+          },
+          {
+            label: "Minor",
+            count: minor,
+            color: "text-blue-400",
+            bg: "hover:bg-blue-500/5",
+          },
+        ].map((s) => (
+          <motion.div
+            key={s.label}
+            whileHover={{ backgroundColor: "transparent" }}
+            className={`flex flex-col items-center justify-center py-4 transition-colors ${s.bg}`}
+          >
+            <p className={`text-2xl font-bold ${s.color}`}>{s.count}</p>
+            <p className="text-xs text-neutral-500 mt-0.5">{s.label}</p>
+          </motion.div>
+        ))}
       </div>
     </motion.div>
   );

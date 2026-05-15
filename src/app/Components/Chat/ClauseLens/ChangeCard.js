@@ -3,138 +3,136 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown } from "lucide-react";
-import DiffViewer from "./DiffViewer";
+
+const RISK = {
+  CRITICAL: {
+    text: "text-red-400",
+    border: "border-red-500/20",
+    bg: "bg-red-500/5",
+    badge: "border-red-400/40 text-red-400",
+  },
+  MODERATE: {
+    text: "text-yellow-400",
+    border: "border-yellow-500/20",
+    bg: "bg-yellow-500/5",
+    badge: "border-yellow-400/40 text-yellow-400",
+  },
+  MINOR: {
+    text: "text-blue-400",
+    border: "border-blue-500/20",
+    bg: "bg-blue-500/5",
+    badge: "border-blue-400/40 text-blue-400",
+  },
+};
+
+const REC = {
+  Reject: "text-red-400",
+  Negotiate: "text-yellow-400",
+  Acceptable: "text-[#00ff88]",
+};
+
+const TYPE_ICON = { addition: "＋", removal: "－", modification: "✎" };
 
 const ChangeCard = ({ change, index }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-
-  const getRiskColor = (level) => {
-    switch (level) {
-      case "CRITICAL":
-        return "text-red-400";
-      case "MODERATE":
-        return "text-yellow-400";
-      case "MINOR":
-        return "text-blue-400";
-      default:
-        return "text-neutral-400";
-    }
-  };
-
-  const getRiskBg = (level) => {
-    switch (level) {
-      case "CRITICAL":
-        return "bg-red-500/10 border-red-500/30";
-      case "MODERATE":
-        return "bg-yellow-500/10 border-yellow-500/30";
-      case "MINOR":
-        return "bg-blue-500/10 border-blue-500/30";
-      default:
-        return "bg-neutral-500/10 border-neutral-500/30";
-    }
-  };
-
-  const getRecommendationColor = (rec) => {
-    switch (rec) {
-      case "Reject":
-        return "text-red-400";
-      case "Negotiate":
-        return "text-yellow-400";
-      case "Acceptable":
-        return "text-green-400";
-      default:
-        return "text-neutral-400";
-    }
-  };
-
-  const getChangeTypeIcon = (type) => {
-    switch (type) {
-      case "addition":
-        return "➕";
-      case "removal":
-        return "➖";
-      case "modification":
-        return "✏️";
-      default:
-        return "•";
-    }
-  };
+  const [open, setOpen] = useState(false);
+  const r = RISK[change.risk_level] || RISK.MINOR;
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.05 }}
-      className={`border rounded-lg p-4 transition-all ${getRiskBg(
-        change.risk_level
-      )}`}
+      transition={{ delay: index * 0.04 }}
+      className={`rounded-xl border ${r.border} ${r.bg} overflow-hidden transition-all`}
     >
-      {/* Header */}
-      <motion.button
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-start justify-between hover:opacity-75 transition-opacity"
+      {/* Header row */}
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-start gap-3 p-4 text-left hover:bg-white/[0.02] transition-colors"
       >
-        <div className="flex-1 text-left">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-lg">{getChangeTypeIcon(change.type)}</span>
-            <h3 className="font-semibold text-white text-sm sm:text-base">
+        <span className={`text-base mt-0.5 flex-shrink-0 font-mono ${r.text}`}>
+          {TYPE_ICON[change.type] || "•"}
+        </span>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap mb-1.5">
+            <h3 className="text-sm font-semibold text-white">
               {change.section}
             </h3>
-            <motion.span
-              className={`text-xs font-bold px-2 py-1 rounded border ${getRiskColor(
-                change.risk_level
-              )} border-current`}
+            <span
+              className={`text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase tracking-wider ${r.badge}`}
             >
               {change.risk_level}
-            </motion.span>
+            </span>
           </div>
-          <p className="text-sm text-neutral-300 leading-relaxed">
+          <p className="text-xs text-neutral-400 leading-relaxed">
             {change.plain_english}
           </p>
         </div>
         <motion.div
-          animate={{ rotate: isExpanded ? 180 : 0 }}
+          animate={{ rotate: open ? 180 : 0 }}
           transition={{ duration: 0.2 }}
-          className="ml-3 flex-shrink-0 mt-1"
+          className="flex-shrink-0 mt-1"
         >
-          <ChevronDown className="w-4 h-4 text-neutral-400" />
+          <ChevronDown className="w-4 h-4 text-neutral-500" />
         </motion.div>
-      </motion.button>
+      </button>
 
-      {/* Expanded Content */}
+      {/* Expanded */}
       <AnimatePresence>
-        {isExpanded && (
+        {open && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.2 }}
-            className="mt-4 space-y-4 border-t border-current border-opacity-20 pt-4"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.22 }}
+            className="overflow-hidden"
           >
-            {/* Why It Matters */}
-            <div className="space-y-2">
-              <p className="text-xs font-semibold text-neutral-400 uppercase tracking-wide">
-                Why It Matters
-              </p>
-              <p className="text-sm text-neutral-300 leading-relaxed">
-                {change.why_it_matters}
-              </p>
-            </div>
+            <div className="px-4 pb-4 space-y-3 border-t border-white/5 pt-3">
+              {/* Why it matters */}
+              <div className="p-3 rounded-lg bg-[#111411] border border-[#2a2e2a]">
+                <p className="text-[10px] text-neutral-500 uppercase tracking-wider font-semibold mb-1">
+                  Why it matters
+                </p>
+                <p className="text-xs text-neutral-300 leading-relaxed">
+                  {change.why_it_matters}
+                </p>
+              </div>
 
-            {/* Recommendation */}
-            <div className="flex items-center justify-between p-3 bg-neutral-900/50 rounded-lg border border-neutral-700">
-              <span className="text-sm text-neutral-400">Recommendation:</span>
-              <motion.span
-                className={`font-bold text-sm ${getRecommendationColor(
-                  change.recommendation
-                )}`}
-              >
-                {change.recommendation}
-              </motion.span>
-            </div>
+              {/* Recommendation */}
+              <div className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-[#111411] border border-[#2a2e2a]">
+                <span className="text-xs text-neutral-500">Recommendation</span>
+                <span
+                  className={`text-xs font-bold ${REC[change.recommendation] || "text-neutral-400"}`}
+                >
+                  {change.recommendation}
+                </span>
+              </div>
 
-            {/* Diff Viewer */}
-            <DiffViewer change={change} />
+              {/* Text diff */}
+              {(change.original || change.modified) && (
+                <div className="space-y-2">
+                  {change.original && (
+                    <div className="p-3 rounded-lg bg-red-500/5 border border-red-500/20">
+                      <p className="text-[10px] text-red-400 uppercase tracking-wider font-semibold mb-1.5">
+                        Before
+                      </p>
+                      <p className="text-xs text-red-300/70 leading-relaxed line-through">
+                        {change.original}
+                      </p>
+                    </div>
+                  )}
+                  {change.modified && (
+                    <div className="p-3 rounded-lg bg-[#00ff88]/5 border border-[#00ff88]/20">
+                      <p className="text-[10px] text-[#00ff88] uppercase tracking-wider font-semibold mb-1.5">
+                        After
+                      </p>
+                      <p className="text-xs text-[#00ff88]/80 leading-relaxed">
+                        {change.modified}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
