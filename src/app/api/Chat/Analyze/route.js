@@ -1,20 +1,8 @@
 import { buildAnalysisPrompt, systemPrompt } from "@/lib/claudePrompt";
 
 async function analyzeWithAnthropic(original, revised, apiKey) {
-  console.log("🤖 Trying Anthropic Claude API...");
+  console.log("🤖 [1/4] Trying Anthropic Claude API...");
   const prompt = buildAnalysisPrompt(original, revised);
-
-  const payload = {
-    model: "claude-sonnet-4-20250514",
-    max_tokens: 4096,
-    system: systemPrompt,
-    messages: [
-      {
-        role: "user",
-        content: prompt,
-      },
-    ],
-  };
 
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -23,9 +11,15 @@ async function analyzeWithAnthropic(original, revised, apiKey) {
       "anthropic-version": "2023-06-01",
       "content-type": "application/json",
     },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 4096,
+      system: systemPrompt,
+      messages: [{ role: "user", content: prompt }],
+    }),
   });
 
+  console.log("📡 Anthropic status:", response.status);
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     throw new Error(
@@ -34,27 +28,13 @@ async function analyzeWithAnthropic(original, revised, apiKey) {
   }
 
   const data = await response.json();
+  console.log("✅ Anthropic succeeded");
   return data.content[0].text;
 }
 
 async function analyzeWithDeepSeek(original, revised, apiKey) {
-  console.log("🤖 Trying DeepSeek API...");
+  console.log("🤖 [2/4] Trying DeepSeek API...");
   const prompt = buildAnalysisPrompt(original, revised);
-
-  const payload = {
-    model: "deepseek-chat",
-    max_tokens: 4096,
-    messages: [
-      {
-        role: "system",
-        content: systemPrompt,
-      },
-      {
-        role: "user",
-        content: prompt,
-      },
-    ],
-  };
 
   const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
     method: "POST",
@@ -62,9 +42,17 @@ async function analyzeWithDeepSeek(original, revised, apiKey) {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({
+      model: "deepseek-chat",
+      max_tokens: 4096,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: prompt },
+      ],
+    }),
   });
 
+  console.log("📡 DeepSeek status:", response.status);
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     throw new Error(
@@ -73,27 +61,44 @@ async function analyzeWithDeepSeek(original, revised, apiKey) {
   }
 
   const data = await response.json();
+  console.log("✅ DeepSeek succeeded");
   return data.choices[0].message.content;
 }
 
-async function analyzeWithOpenRouter(original, revised, apiKey) {
-  console.log("🤖 Trying OpenRouter API...");
+async function analyzeWithGemini(original, revised, apiKey) {
+  console.log("🤖 [3/4] Trying Gemini (gemini-1.5-flash)...");
   const prompt = buildAnalysisPrompt(original, revised);
 
-  const payload = {
-    model: "deepseek/deepseek-chat",
-    max_tokens: 4096,
-    messages: [
-      {
-        role: "system",
-        content: systemPrompt,
-      },
-      {
-        role: "user",
-        content: prompt,
-      },
-    ],
-  };
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      system_instruction: { parts: [{ text: systemPrompt }] },
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { maxOutputTokens: 4096, temperature: 0.1 },
+    }),
+  });
+
+  console.log("📡 Gemini status:", response.status);
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(
+      `Gemini error ${response.status}: ${JSON.stringify(errorData.error || errorData)}`,
+    );
+  }
+
+  const data = await response.json();
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!text) throw new Error("Gemini returned empty content");
+  console.log("✅ Gemini succeeded");
+  return text;
+}
+
+async function analyzeWithOpenRouter(original, revised, apiKey) {
+  console.log("🤖 [4/4] Trying OpenRouter (DeepSeek)...");
+  const prompt = buildAnalysisPrompt(original, revised);
 
   const response = await fetch(
     "https://openrouter.ai/api/v1/chat/completions",
@@ -103,10 +108,18 @@ async function analyzeWithOpenRouter(original, revised, apiKey) {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        model: "deepseek/deepseek-chat",
+        max_tokens: 4096,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: prompt },
+        ],
+      }),
     },
   );
 
+  console.log("📡 OpenRouter status:", response.status);
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     throw new Error(
@@ -115,25 +128,34 @@ async function analyzeWithOpenRouter(original, revised, apiKey) {
   }
 
   const data = await response.json();
+  console.log("✅ OpenRouter succeeded");
   return data.choices[0].message.content;
 }
 
 function parseAnalysisResponse(responseText) {
-  const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+  console.log("🔍 Raw response preview:", responseText.slice(0, 300));
+  const stripped = responseText
+    .replace(/```json\n?/g, "")
+    .replace(/```\n?/g, "")
+    .trim();
+  const jsonMatch = stripped.match(/\{[\s\S]*\}/);
   if (jsonMatch) {
     return JSON.parse(jsonMatch[0]);
   }
-  return JSON.parse(responseText);
+  throw new Error("No JSON object found in response");
 }
 
 export async function POST(req) {
-  console.log("📥 Incoming POST request to /api/Chat/Analyze");
+  console.log("\n========================================");
+  console.log("📥 POST /api/Chat/Analyze");
+  console.log("========================================");
 
   try {
     const body = await req.json();
     const { original, revised } = body;
 
     if (!original || !revised) {
+      console.error("❌ Missing original or revised text");
       return new Response(
         JSON.stringify({
           error: "Both original and revised documents are required",
@@ -142,24 +164,29 @@ export async function POST(req) {
       );
     }
 
-    console.log("📄 Original doc length:", original.length);
-    console.log("📄 Revised doc length:", revised.length);
+    console.log("📄 Original length:", original.length, "chars");
+    console.log("📄 Revised length:", revised.length, "chars");
 
     const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+    const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
     const OPENROUTER_API_KEY = process.env.OPENROUTERS_API_KEY;
 
-    // Detect key type by prefix
     const isRealAnthropicKey = ANTHROPIC_API_KEY?.startsWith("sk-ant-");
-    const isDeepSeekKey =
-      ANTHROPIC_API_KEY?.startsWith("sk-") && !isRealAnthropicKey;
+    const isDeepSeekKey = DEEPSEEK_API_KEY?.startsWith("sk-");
     const isOpenRouterKey = OPENROUTER_API_KEY?.startsWith("sk-or-");
+
+    console.log("🔑 Anthropic:", isRealAnthropicKey ? "✅" : "❌");
+    console.log("🔑 DeepSeek:", isDeepSeekKey ? "✅" : "❌");
+    console.log("🔑 Gemini:", !!GEMINI_API_KEY ? "✅" : "❌");
+    console.log("🔑 OpenRouter:", isOpenRouterKey ? "✅" : "❌");
 
     let responseText = null;
     let apiUsed = null;
     let lastError = null;
 
-    // 1. Try real Anthropic key
-    if (isRealAnthropicKey) {
+    // 1. Anthropic
+    if (!responseText && isRealAnthropicKey) {
       try {
         responseText = await analyzeWithAnthropic(
           original,
@@ -167,30 +194,43 @@ export async function POST(req) {
           ANTHROPIC_API_KEY,
         );
         apiUsed = "Anthropic Claude";
-        console.log("✅ Anthropic API succeeded");
       } catch (error) {
-        console.error("⚠️ Anthropic API failed:", error.message);
+        console.error("⚠️ Anthropic failed:", error.message);
         lastError = error;
       }
     }
 
-    // 2. Try DeepSeek key directly
+    // 2. DeepSeek
     if (!responseText && isDeepSeekKey) {
       try {
         responseText = await analyzeWithDeepSeek(
           original,
           revised,
-          ANTHROPIC_API_KEY,
+          DEEPSEEK_API_KEY,
         );
         apiUsed = "DeepSeek";
-        console.log("✅ DeepSeek API succeeded");
       } catch (error) {
-        console.error("⚠️ DeepSeek API failed:", error.message);
+        console.error("⚠️ DeepSeek failed:", error.message);
         lastError = error;
       }
     }
 
-    // 3. Fallback to OpenRouter
+    // 3. Gemini
+    if (!responseText && GEMINI_API_KEY) {
+      try {
+        responseText = await analyzeWithGemini(
+          original,
+          revised,
+          GEMINI_API_KEY,
+        );
+        apiUsed = "Gemini 1.5 Flash";
+      } catch (error) {
+        console.error("⚠️ Gemini failed:", error.message);
+        lastError = error;
+      }
+    }
+
+    // 4. OpenRouter
     if (!responseText && isOpenRouterKey) {
       try {
         responseText = await analyzeWithOpenRouter(
@@ -199,9 +239,8 @@ export async function POST(req) {
           OPENROUTER_API_KEY,
         );
         apiUsed = "OpenRouter (DeepSeek)";
-        console.log("✅ OpenRouter API succeeded");
       } catch (error) {
-        console.error("⚠️ OpenRouter API failed:", error.message);
+        console.error("⚠️ OpenRouter failed:", error.message);
         lastError = error;
       }
     }
@@ -220,16 +259,20 @@ export async function POST(req) {
       );
     }
 
+    console.log("🔧 API that succeeded:", apiUsed);
+
     let analysisResult;
     try {
-      console.log("📝 Parsing response from", apiUsed);
       analysisResult = parseAnalysisResponse(responseText);
+      console.log("✅ JSON parsed successfully");
+      console.log("📊 Changes detected:", analysisResult.changes?.length ?? 0);
+      console.log("🚦 Overall risk:", analysisResult.overall_risk);
     } catch (parseError) {
-      console.error("❌ Failed to parse JSON response:", parseError);
-      console.error("Raw response:", responseText.slice(0, 500));
+      console.error("❌ JSON parse failed:", parseError.message);
+      console.error("📄 Full raw response:\n", responseText);
       return new Response(
         JSON.stringify({
-          error: "Invalid response format from analysis service",
+          error: "Failed to parse analysis response as JSON.",
           details:
             process.env.NODE_ENV === "development"
               ? parseError.message
@@ -239,16 +282,13 @@ export async function POST(req) {
       );
     }
 
-    console.log("✅ Successfully parsed analysis result");
-    console.log("📊 Changes detected:", analysisResult.changes?.length || 0);
-    console.log("🔧 API Used:", apiUsed);
-
+    console.log("========================================\n");
     return new Response(JSON.stringify(analysisResult), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("❌ Unexpected error:", error);
+    console.error("❌ Unexpected top-level error:", error);
     return new Response(
       JSON.stringify({
         error: "Unexpected server error.",
