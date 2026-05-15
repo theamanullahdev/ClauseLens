@@ -7,13 +7,13 @@ async function analyzeWithAnthropic(original, revised, apiKey) {
   const payload = {
     model: "claude-sonnet-4-20250514",
     max_tokens: 4096,
+    system: systemPrompt,
     messages: [
       {
         role: "user",
         content: prompt,
       },
     ],
-    system: systemPrompt,
   };
 
   const response = await fetch("https://api.anthropic.com/v1/messages", {
@@ -24,24 +24,26 @@ async function analyzeWithAnthropic(original, revised, apiKey) {
       "content-type": "application/json",
     },
     body: JSON.stringify(payload),
-    timeout: 30000,
   });
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(`Anthropic error: ${errorData.error?.message || response.statusText}`);
+    throw new Error(
+      `Anthropic error ${response.status}: ${errorData.error?.message || response.statusText}`,
+    );
   }
 
   const data = await response.json();
   return data.content[0].text;
 }
 
-async function analyzeWithOpenRouter(original, revised, apiKey) {
-  console.log("🤖 Trying OpenRouter API...");
+async function analyzeWithDeepSeek(original, revised, apiKey) {
+  console.log("🤖 Trying DeepSeek API...");
   const prompt = buildAnalysisPrompt(original, revised);
 
   const payload = {
-    model: "deepseek/deepseek-chat",
+    model: "deepseek-chat",
+    max_tokens: 4096,
     messages: [
       {
         role: "system",
@@ -52,26 +54,76 @@ async function analyzeWithOpenRouter(original, revised, apiKey) {
         content: prompt,
       },
     ],
-    max_tokens: 4096,
   };
 
-  const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+  const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify(payload),
-    timeout: 30000,
   });
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(`OpenRouter error: ${errorData.error?.message || response.statusText}`);
+    throw new Error(
+      `DeepSeek error ${response.status}: ${errorData.error?.message || response.statusText}`,
+    );
   }
 
   const data = await response.json();
   return data.choices[0].message.content;
+}
+
+async function analyzeWithOpenRouter(original, revised, apiKey) {
+  console.log("🤖 Trying OpenRouter API...");
+  const prompt = buildAnalysisPrompt(original, revised);
+
+  const payload = {
+    model: "deepseek/deepseek-chat",
+    max_tokens: 4096,
+    messages: [
+      {
+        role: "system",
+        content: systemPrompt,
+      },
+      {
+        role: "user",
+        content: prompt,
+      },
+    ],
+  };
+
+  const response = await fetch(
+    "https://openrouter.ai/api/v1/chat/completions",
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    },
+  );
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(
+      `OpenRouter error ${response.status}: ${errorData.error?.message || response.statusText}`,
+    );
+  }
+
+  const data = await response.json();
+  return data.choices[0].message.content;
+}
+
+function parseAnalysisResponse(responseText) {
+  const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+  if (jsonMatch) {
+    return JSON.parse(jsonMatch[0]);
+  }
+  return JSON.parse(responseText);
 }
 
 export async function POST(req) {
@@ -83,27 +135,37 @@ export async function POST(req) {
 
     if (!original || !revised) {
       return new Response(
-        JSON.stringify({ error: "Both original and revised documents are required" }),
-        { status: 400 }
+        JSON.stringify({
+          error: "Both original and revised documents are required",
+        }),
+        { status: 400, headers: { "Content-Type": "application/json" } },
       );
     }
 
     console.log("📄 Original doc length:", original.length);
     console.log("📄 Revised doc length:", revised.length);
 
-    // Try available API keys in order
     const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
     const OPENROUTER_API_KEY = process.env.OPENROUTERS_API_KEY;
 
-    let responseText;
+    // Detect key type by prefix
+    const isRealAnthropicKey = ANTHROPIC_API_KEY?.startsWith("sk-ant-");
+    const isDeepSeekKey =
+      ANTHROPIC_API_KEY?.startsWith("sk-") && !isRealAnthropicKey;
+    const isOpenRouterKey = OPENROUTER_API_KEY?.startsWith("sk-or-");
+
+    let responseText = null;
     let apiUsed = null;
     let lastError = null;
 
-    // Try Anthropic first
-    if (ANTHROPIC_API_KEY && ANTHROPIC_API_KEY.includes("sk-")) {
+    // 1. Try real Anthropic key
+    if (isRealAnthropicKey) {
       try {
-        console.log("🤖 Trying Anthropic Claude API...");
-        responseText = await analyzeWithAnthropic(original, revised, ANTHROPIC_API_KEY);
+        responseText = await analyzeWithAnthropic(
+          original,
+          revised,
+          ANTHROPIC_API_KEY,
+        );
         apiUsed = "Anthropic Claude";
         console.log("✅ Anthropic API succeeded");
       } catch (error) {
@@ -112,11 +174,30 @@ export async function POST(req) {
       }
     }
 
-    // Fallback to OpenRouter if Anthropic failed or unavailable
-    if (!responseText && OPENROUTER_API_KEY && OPENROUTER_API_KEY.includes("sk-or")) {
+    // 2. Try DeepSeek key directly
+    if (!responseText && isDeepSeekKey) {
       try {
-        console.log("🤖 Trying OpenRouter API (DeepSeek)...");
-        responseText = await analyzeWithOpenRouter(original, revised, OPENROUTER_API_KEY);
+        responseText = await analyzeWithDeepSeek(
+          original,
+          revised,
+          ANTHROPIC_API_KEY,
+        );
+        apiUsed = "DeepSeek";
+        console.log("✅ DeepSeek API succeeded");
+      } catch (error) {
+        console.error("⚠️ DeepSeek API failed:", error.message);
+        lastError = error;
+      }
+    }
+
+    // 3. Fallback to OpenRouter
+    if (!responseText && isOpenRouterKey) {
+      try {
+        responseText = await analyzeWithOpenRouter(
+          original,
+          revised,
+          OPENROUTER_API_KEY,
+        );
         apiUsed = "OpenRouter (DeepSeek)";
         console.log("✅ OpenRouter API succeeded");
       } catch (error) {
@@ -125,43 +206,36 @@ export async function POST(req) {
       }
     }
 
-    // If both failed, return error
     if (!responseText) {
       console.error("❌ All APIs failed. Last error:", lastError?.message);
       return new Response(
         JSON.stringify({
-          error: "We could not connect to our servers, but app must work. No valid API keys configured. Please add ANTHROPIC_API_KEY or OPENROUTERS_API_KEY to .env",
-          details: process.env.NODE_ENV === "development" ? lastError?.message : undefined,
+          error: "All analysis APIs failed. Check your API keys in .env.",
+          details:
+            process.env.NODE_ENV === "development"
+              ? lastError?.message
+              : undefined,
         }),
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        }
+        { status: 500, headers: { "Content-Type": "application/json" } },
       );
     }
 
-    // Parse JSON response
     let analysisResult;
     try {
       console.log("📝 Parsing response from", apiUsed);
-      // Try to extract JSON from the response (in case of preamble/explanation)
-      const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        analysisResult = JSON.parse(jsonMatch[0]);
-      } else {
-        analysisResult = JSON.parse(responseText);
-      }
+      analysisResult = parseAnalysisResponse(responseText);
     } catch (parseError) {
       console.error("❌ Failed to parse JSON response:", parseError);
+      console.error("Raw response:", responseText.slice(0, 500));
       return new Response(
         JSON.stringify({
           error: "Invalid response format from analysis service",
-          details: process.env.NODE_ENV === "development" ? parseError.message : undefined,
+          details:
+            process.env.NODE_ENV === "development"
+              ? parseError.message
+              : undefined,
         }),
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        }
+        { status: 500, headers: { "Content-Type": "application/json" } },
       );
     }
 
@@ -174,16 +248,14 @@ export async function POST(req) {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("❌ Request parsing error:", error);
+    console.error("❌ Unexpected error:", error);
     return new Response(
       JSON.stringify({
-        error: "We could not connect to our servers, but app must work.",
-        details: process.env.NODE_ENV === "development" ? error.message : undefined,
+        error: "Unexpected server error.",
+        details:
+          process.env.NODE_ENV === "development" ? error.message : undefined,
       }),
-      {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      }
+      { status: 500, headers: { "Content-Type": "application/json" } },
     );
   }
 }

@@ -1,5 +1,3 @@
-"use client";
-
 export const buildAnalysisPrompt = (original, revised) => {
   return `You are a contract risk analyst. You will be given two versions of a legal document.
 
