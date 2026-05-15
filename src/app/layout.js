@@ -20,8 +20,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "LetterSmith",
-  description: "Generate Your own Custom Cover letter for your Job, Tailored for each Job description individually",
+  title: "ClauseLens - AI-Powered Contract Analysis Tool",
+  description: "Analyze contracts with AI and understand the impact of every change.",
 };
 
 export default function RootLayout({ children }) {
