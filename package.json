@@ -1,0 +1,38 @@
+{
+  "name": "lettersmith",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^7.0.0",
+    "@fortawesome/free-solid-svg-icons": "^7.0.0",
+    "@fortawesome/react-fontawesome": "^0.2.3",
+    "classnames": "^2.5.1",
+    "docx": "^9.5.1",
+    "dotenv": "^17.2.0",
+    "file-saver": "^2.0.5",
+    "formidable": "^3.5.4",
+    "framer-motion": "^12.23.9",
+    "lucide-react": "^0.525.0",
+    "mammoth": "^1.9.1",
+    "next": "15.4.3",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^5.3.93",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-toastify": "^11.0.5",
+    "tesseract.js": "^6.0.1"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "eslint": "^9",
+    "eslint-config-next": "15.4.3",
+    "tailwindcss": "^4"
+  }
+}
