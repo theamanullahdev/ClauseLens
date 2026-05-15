@@ -9,7 +9,7 @@ const navItems = [
   { label: "Home", href: "/" },
   { label: "About", href: "/About" },
   { label: "ClauseLens", href: "/ClauseLens" },
-  { label: "Cover Maker", href: "/CoverLetter" },
+  // { label: "Cover Maker", href: "/CoverLetter" },
   { label: "CV Maker", href: "/CVmaker" },
 ];
 
@@ -28,11 +28,11 @@ const Navbar = () => {
         <Link href="/" className="flex items-center gap-3 cursor-pointer">
           <motion.div whileHover={{ scale: 1.04 }}>
             <div className="w-9 h-9 bg-white text-black flex items-center justify-center text-lg font-bold rounded-lg border border-neutral-600">
-              L
+              C
             </div>
           </motion.div>
           <span className="font-bold tracking-tight text-white text-lg sm:text-xl hidden min-[281px]:inline">
-            Lettersmith
+            ClauseLens
           </span>
         </Link>
 
