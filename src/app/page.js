@@ -81,7 +81,7 @@ function WordCycler() {
           {WORDS[idx]}
         </motion.span>
       </AnimatePresence>
-      {/* invisible placeholder to reserve height */}
+      {/* invisible placeholder to reserve henight */}
       <span className="invisible font-extrabold">{WORDS[0]}</span>
     </span>
   );
