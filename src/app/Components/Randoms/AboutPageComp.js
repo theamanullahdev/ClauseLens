@@ -46,7 +46,7 @@ const PARTICLES = [...Array(22)].map((_, i) => ({
   size: Math.random() * 2.5 + 1,
   left: Math.random() * 100,
   top: Math.random() * 100,
-  color: i % 3 === 0 ? "#00ff88" : i % 3 === 1 ? "#00aaff" : "#ffffff",
+  color: i % 3 === 0 ? "var(--accent)" : i % 3 === 1 ? "#00aaff" : "var(--foreground)",
   opacity: 0.12 + Math.random() * 0.18,
   dur: 4 + Math.random() * 5,
   delay: Math.random() * 4,
@@ -66,6 +66,7 @@ const Particles = () => (
     ))}
   </div>
 );
+
 /* ─── marquee ─── */
 const MARQUEE_ITEMS = [
   "Zero Data Stored", "AI-Powered", "CRITICAL Detection", "MODERATE Risk",
@@ -74,15 +75,18 @@ const MARQUEE_ITEMS = [
 ];
 
 const Marquee = () => (
-  <div className="overflow-hidden border-y border-[#2a2e2a] bg-[#0c0f0c] py-3">
+  <div
+    className="overflow-hidden py-3"
+    style={{ borderTop: "1px solid var(--border-color)", borderBottom: "1px solid var(--border-color)", background: "var(--surface-muted)" }}
+  >
     <motion.div
       className="flex gap-10 whitespace-nowrap w-max"
       animate={{ x: ["0%", "-50%"] }}
       transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
     >
       {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((item, i) => (
-        <span key={i} className="flex items-center gap-3 text-xs font-bold text-neutral-500 uppercase tracking-widest">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#00ff88] inline-block flex-shrink-0" />
+        <span key={i} className="flex items-center gap-3 text-xs font-bold uppercase tracking-widest" style={{ color: "var(--foreground)", opacity: 0.4 }}>
+          <span className="w-1.5 h-1.5 rounded-full inline-block flex-shrink-0" style={{ background: "var(--accent)" }} />
           {item}
         </span>
       ))}
@@ -105,15 +109,19 @@ const FaqItem = ({ q, a, index }) => {
     <motion.div
       {...fadeUp(index * 0.07)}
       onClick={() => setOpen((o) => !o)}
-      className={`border rounded-xl overflow-hidden cursor-pointer transition-all duration-300
-        ${open ? "border-[#00ff88]/30 bg-[#0c120c]" : "border-[#2a2e2a] bg-[#111411] hover:border-[#00ff88]/20"}`}
+      className="rounded-xl overflow-hidden cursor-pointer transition-all duration-300"
+      style={{
+        border: open ? "1px solid rgba(var(--accent-rgb, 0,136,68), 0.3)" : "1px solid var(--border-color)",
+        background: open ? "var(--surface-muted)" : "var(--surface-strong)",
+      }}
     >
       <div className="flex items-center justify-between px-6 py-4">
-        <span className="text-sm font-semibold text-white pr-4">{q}</span>
+        <span className="text-sm font-semibold pr-4" style={{ color: "var(--foreground)" }}>{q}</span>
         <motion.span
           animate={{ rotate: open ? 45 : 0 }}
           transition={{ duration: 0.25 }}
-          className="text-[#00ff88] text-xl flex-shrink-0 leading-none"
+          className="text-xl flex-shrink-0 leading-none"
+          style={{ color: "var(--accent)" }}
         >+</motion.span>
       </div>
       <AnimatePresence initial={false}>
@@ -125,7 +133,10 @@ const FaqItem = ({ q, a, index }) => {
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className="overflow-hidden"
           >
-            <p className="px-6 pb-5 pt-4 text-sm text-neutral-400 leading-relaxed border-t border-[#2a2e2a]">{a}</p>
+            <p
+              className="px-6 pb-5 pt-4 text-sm leading-relaxed"
+              style={{ borderTop: "1px solid var(--border-color)", color: "var(--foreground)", opacity: 0.65 }}
+            >{a}</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -145,21 +156,26 @@ const TEAM = [
 /* ─── main ─── */
 const AboutPage = () => {
   return (
-    <main className="bg-[#0a0a0a] min-h-screen text-white overflow-x-hidden font-sans">
+    <main className="min-h-screen overflow-x-hidden font-sans" style={{ background: "var(--background)", color: "var(--foreground)" }}>
 
       {/* ── HERO ── */}
       <section className="relative flex flex-col items-center text-center px-4 sm:px-6 pt-24 sm:pt-32 pb-20 overflow-hidden">
         <Particles />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[420px] bg-[#00ff88]/4 rounded-full blur-[120px] pointer-events-none" />
+        <div
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[420px] rounded-full blur-[120px] pointer-events-none"
+          style={{ background: "var(--accent-muted)" }}
+        />
 
         <motion.div
           initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#00ff88]/25 bg-[#00ff88]/8 text-[#00ff88] text-xs font-bold tracking-widest uppercase mb-8 relative z-10"
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase mb-8 relative z-10"
+          style={{ border: "1px solid var(--border-color)", background: "var(--accent-muted)", color: "var(--accent)" }}
         >
           <motion.span
-            className="w-1.5 h-1.5 rounded-full bg-[#00ff88]"
+            className="w-1.5 h-1.5 rounded-full"
+            style={{ background: "var(--accent)" }}
             animate={{ opacity: [1, 0.2, 1] }}
             transition={{ duration: 1.5, repeat: Infinity }}
           />
@@ -171,12 +187,14 @@ const AboutPage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
           className="relative z-10 text-4xl sm:text-6xl lg:text-7xl font-extrabold leading-[1.1] mb-6 max-w-5xl"
+          style={{ color: "var(--foreground)" }}
         >
           Contract review that{" "}
-          <span className="text-[#00ff88] relative inline-block">
+          <span className="relative inline-block" style={{ color: "var(--accent)" }}>
             thinks like a lawyer.
             <motion.span
-              className="absolute -bottom-1 left-0 h-[3px] bg-[#00ff88] rounded-full"
+              className="absolute -bottom-1 left-0 h-[3px] rounded-full"
+              style={{ background: "var(--accent)" }}
               initial={{ width: 0 }}
               animate={{ width: "100%" }}
               transition={{ duration: 0.8, delay: 0.9 }}
@@ -188,7 +206,8 @@ const AboutPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.35 }}
-          className="relative z-10 text-neutral-400 text-base sm:text-lg max-w-2xl leading-relaxed mb-12"
+          className="relative z-10 text-base sm:text-lg max-w-2xl leading-relaxed mb-12"
+          style={{ color: "var(--foreground)", opacity: 0.6 }}
         >
           Upload two contract versions. Get every change detected, risk-scored,
           and explained in plain English — in seconds. No lawyers required.
@@ -199,42 +218,50 @@ const AboutPage = () => {
           initial={{ opacity: 0, y: 40, scale: 0.97 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.7, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="relative z-10 w-full max-w-2xl border border-[#2a2e2a] rounded-2xl bg-[#0d110d] overflow-hidden"
+          className="relative z-10 w-full max-w-2xl rounded-2xl overflow-hidden"
+          style={{ border: "1px solid var(--border-color)", background: "var(--surface-strong)" }}
         >
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-[#2a2e2a] bg-[#111411]">
-            <span className="w-3 h-3 rounded-full bg-red-500/60" />
-            <span className="w-3 h-3 rounded-full bg-yellow-500/60" />
-            <span className="w-3 h-3 rounded-full bg-[#00ff88]/60" />
-            <span className="ml-3 text-xs text-neutral-600 font-mono">clauselens — analysis</span>
+          <div
+            className="flex items-center gap-2 px-4 py-3"
+            style={{ borderBottom: "1px solid var(--border-color)", background: "var(--surface-muted)" }}
+          >
+            <span className="w-3 h-3 rounded-full bg-red-400/60" />
+            <span className="w-3 h-3 rounded-full bg-yellow-400/60" />
+            <span className="w-3 h-3 rounded-full" style={{ background: "var(--accent)", opacity: 0.6 }} />
+            <span className="ml-3 text-xs font-mono" style={{ color: "var(--foreground)", opacity: 0.4 }}>clauselens — analysis</span>
           </div>
           <div className="p-5 font-mono text-xs space-y-2">
             {[
-              { label: "Scanning clauses...", color: "text-neutral-500" },
-              { label: "Detected 7 changes", color: "text-neutral-300" },
-              { label: "Risk analysis complete", color: "text-[#00ff88]" },
+              { label: "Scanning clauses...", dimmed: true },
+              { label: "Detected 7 changes", dimmed: false },
+              { label: "Risk analysis complete", accent: true },
             ].map((line, i) => (
               <motion.div
                 key={line.label}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.8 + i * 0.35 }}
-                className={`flex items-center gap-2 ${line.color}`}
+                className="flex items-center gap-2"
+                style={{
+                  color: line.accent ? "var(--accent)" : line.dimmed ? "var(--foreground)" : "var(--foreground)",
+                  opacity: line.dimmed ? 0.45 : 1,
+                }}
               >
-                <span className="text-[#00ff88]">›</span>
+                <span style={{ color: "var(--accent)" }}>›</span>
                 {line.label}
                 <motion.span
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 1.1 + i * 0.35, type: "spring" }}
-                  className="text-[#00ff88]"
+                  style={{ color: "var(--accent)" }}
                 >✓</motion.span>
               </motion.div>
             ))}
             <div className="mt-4 space-y-2">
               {[
-                { risk: "CRITICAL", label: "Liability cap removed", w: "85%", textCol: "text-red-400", barCol: "bg-red-500" },
-                { risk: "MODERATE", label: "Payment window 30→60 days", w: "60%", textCol: "text-yellow-400", barCol: "bg-yellow-500" },
-                { risk: "MINOR", label: "Governing law updated", w: "35%", textCol: "text-[#00ff88]", barCol: "bg-[#00ff88]" },
+                { risk: "CRITICAL", label: "Liability cap removed", w: "85%", textCol: "text-red-500", barCol: "bg-red-500" },
+                { risk: "MODERATE", label: "Payment window 30→60 days", w: "60%", textCol: "text-yellow-500", barCol: "bg-yellow-500" },
+                { risk: "MINOR", label: "Governing law updated", w: "35%", textCol: "", barCol: "" },
               ].map((item, i) => (
                 <motion.div
                   key={item.risk}
@@ -243,16 +270,20 @@ const AboutPage = () => {
                   transition={{ delay: 1.7 + i * 0.2 }}
                   className="flex items-center gap-3"
                 >
-                  <span className={`text-[10px] font-bold w-16 flex-shrink-0 ${item.textCol}`}>{item.risk}</span>
-                  <div className="flex-1 h-1 bg-[#1a1a1a] rounded-full overflow-hidden">
+                  <span
+                    className={`text-[10px] font-bold w-16 flex-shrink-0 ${item.textCol}`}
+                    style={!item.textCol ? { color: "var(--accent)" } : {}}
+                  >{item.risk}</span>
+                  <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: "var(--border-color)" }}>
                     <motion.div
                       className={`h-full rounded-full ${item.barCol}`}
+                      style={!item.barCol ? { background: "var(--accent)" } : {}}
                       initial={{ width: 0 }}
                       animate={{ width: item.w }}
                       transition={{ delay: 2 + i * 0.2, duration: 0.6 }}
                     />
                   </div>
-                  <span className="text-neutral-600 text-[10px] hidden sm:block">{item.label}</span>
+                  <span className="text-[10px] hidden sm:block" style={{ color: "var(--foreground)", opacity: 0.4 }}>{item.label}</span>
                 </motion.div>
               ))}
             </div>
@@ -281,32 +312,33 @@ const AboutPage = () => {
             <motion.div
               key={s.label}
               variants={staggerChild}
-              whileHover={{ scale: 1.04, borderColor: "rgba(0,255,136,0.35)" }}
-              className="flex flex-col items-center justify-center py-10 rounded-2xl border border-[#2a2e2a] bg-[#111411] transition-all duration-300"
+              whileHover={{ scale: 1.04 }}
+              className="flex flex-col items-center justify-center py-10 rounded-2xl transition-all duration-300"
+              style={{ border: "1px solid var(--border-color)", background: "var(--surface-strong)" }}
             >
-              <span className="text-4xl sm:text-5xl font-extrabold text-[#00ff88] tabular-nums">
+              <span className="text-4xl sm:text-5xl font-extrabold tabular-nums" style={{ color: "var(--accent)" }}>
                 <Counter target={s.value} suffix={s.suffix} />
               </span>
-              <span className="text-xs text-neutral-500 mt-2 uppercase tracking-widest">{s.label}</span>
+              <span className="text-xs mt-2 uppercase tracking-widest" style={{ color: "var(--foreground)", opacity: 0.45 }}>{s.label}</span>
             </motion.div>
           ))}
         </motion.div>
       </section>
 
       {/* ── WHY WE BUILT IT ── */}
-      <section className="w-[82%] mx-auto py-16 border-t border-[#2a2e2a]">
+      <section className="w-[82%] mx-auto py-16" style={{ borderTop: "1px solid var(--border-color)" }}>
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <motion.div {...fadeUp(0)}>
-            <p className="text-xs font-bold text-[#00ff88] uppercase tracking-widest mb-4">The Problem</p>
-            <h2 className="text-3xl sm:text-4xl font-extrabold leading-tight mb-5">
-              The diff is where the <span className="text-[#00ff88]">danger lives.</span>
+            <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: "var(--accent)" }}>The Problem</p>
+            <h2 className="text-3xl sm:text-4xl font-extrabold leading-tight mb-5" style={{ color: "var(--foreground)" }}>
+              The diff is where the <span style={{ color: "var(--accent)" }}>danger lives.</span>
             </h2>
-            <p className="text-neutral-400 text-sm sm:text-base leading-relaxed mb-4">
+            <p className="text-sm sm:text-base leading-relaxed mb-4" style={{ color: "var(--foreground)", opacity: 0.6 }}>
               Contracts get revised. Clauses get swapped, liability caps quietly halved,
               termination windows tightened. Most people sign without catching it — not
               because they&apos;re careless, but because line-by-line comparison is brutal.
             </p>
-            <p className="text-neutral-400 text-sm sm:text-base leading-relaxed">
+            <p className="text-sm sm:text-base leading-relaxed" style={{ color: "var(--foreground)", opacity: 0.6 }}>
               ClauseLens flags every change, explains it in plain English, and tells you
               whether to reject, negotiate, or accept. In seconds.
             </p>
@@ -314,9 +346,9 @@ const AboutPage = () => {
 
           <motion.div {...fadeUp(0.15)} className="flex flex-col gap-3">
             {[
-              { risk: "CRITICAL", label: "Liability cap removed", detail: "You are now fully exposed to unlimited damages.", badge: "text-red-400 border-red-400/30 bg-red-400/8", rec: "Reject", recCol: "text-red-400" },
-              { risk: "MODERATE", label: "Payment window 30 → 60 days", detail: "Cash flow impact on invoices exceeding $50,000.", badge: "text-yellow-400 border-yellow-400/30 bg-yellow-400/8", rec: "Negotiate", recCol: "text-yellow-400" },
-              { risk: "MINOR", label: "Governing law clause updated", detail: "Jurisdiction changed from NY to DE — minor impact.", badge: "text-[#00ff88] border-[#00ff88]/30 bg-[#00ff88]/8", rec: "Acceptable", recCol: "text-[#00ff88]" },
+              { risk: "CRITICAL", label: "Liability cap removed", detail: "You are now fully exposed to unlimited damages.", badgeColor: "#ef4444", badgeBg: "rgba(239,68,68,0.08)", rec: "Reject", recColor: "#ef4444" },
+              { risk: "MODERATE", label: "Payment window 30 → 60 days", detail: "Cash flow impact on invoices exceeding $50,000.", badgeColor: "#eab308", badgeBg: "rgba(234,179,8,0.08)", rec: "Negotiate", recColor: "#eab308" },
+              { risk: "MINOR", label: "Governing law clause updated", detail: "Jurisdiction changed from NY to DE — minor impact.", badgeColor: "var(--accent)", badgeBg: "var(--accent-muted)", rec: "Acceptable", recColor: "var(--accent)" },
             ].map((item, i) => (
               <motion.div
                 key={item.risk}
@@ -324,17 +356,21 @@ const AboutPage = () => {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.15 + 0.2, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-                whileHover={{ x: 6, borderColor: "rgba(0,255,136,0.2)" }}
-                className="flex items-start gap-4 p-5 rounded-xl border border-[#2a2e2a] bg-[#111411] transition-all duration-300"
+                whileHover={{ x: 6 }}
+                className="flex items-start gap-4 p-5 rounded-xl transition-all duration-300"
+                style={{ border: "1px solid var(--border-color)", background: "var(--surface-strong)" }}
               >
-                <span className={`flex-shrink-0 border rounded-full px-2 py-0.5 text-[10px] font-extrabold uppercase mt-0.5 ${item.badge}`}>
+                <span
+                  className="flex-shrink-0 rounded-full px-2 py-0.5 text-[10px] font-extrabold uppercase mt-0.5"
+                  style={{ border: `1px solid ${item.badgeColor}40`, background: item.badgeBg, color: item.badgeColor }}
+                >
                   {item.risk}
                 </span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-white">{item.label}</p>
-                  <p className="text-xs text-neutral-500 mt-0.5">{item.detail}</p>
+                  <p className="text-sm font-semibold" style={{ color: "var(--foreground)" }}>{item.label}</p>
+                  <p className="text-xs mt-0.5" style={{ color: "var(--foreground)", opacity: 0.5 }}>{item.detail}</p>
                 </div>
-                <span className={`text-xs font-bold flex-shrink-0 ${item.recCol}`}>{item.rec}</span>
+                <span className="text-xs font-bold flex-shrink-0" style={{ color: item.recColor }}>{item.rec}</span>
               </motion.div>
             ))}
           </motion.div>
@@ -342,10 +378,10 @@ const AboutPage = () => {
       </section>
 
       {/* ── HOW IT WORKS ── */}
-      <section className="w-[82%] mx-auto py-16 border-t border-[#2a2e2a]">
+      <section className="w-[82%] mx-auto py-16" style={{ borderTop: "1px solid var(--border-color)" }}>
         <motion.div {...fadeUp()} className="mb-12">
-          <p className="text-xs font-bold text-[#00ff88] uppercase tracking-widest mb-3">How It Works</p>
-          <h2 className="text-3xl sm:text-4xl font-extrabold">Four steps. Zero friction.</h2>
+          <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "var(--accent)" }}>How It Works</p>
+          <h2 className="text-3xl sm:text-4xl font-extrabold" style={{ color: "var(--foreground)" }}>Four steps. Zero friction.</h2>
         </motion.div>
 
         <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-5">
@@ -361,17 +397,19 @@ const AboutPage = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.12, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-              whileHover={{ y: -6, borderColor: "rgba(0,255,136,0.35)" }}
-              className="relative p-7 rounded-2xl border border-[#2a2e2a] bg-[#111411] transition-all duration-300 group overflow-hidden"
+              whileHover={{ y: -6 }}
+              className="relative p-7 rounded-2xl transition-all duration-300 group overflow-hidden"
+              style={{ border: "1px solid var(--border-color)", background: "var(--surface-strong)" }}
             >
-              <span className="text-5xl font-extrabold text-[#2a2e2a] group-hover:text-[#00ff88]/12 transition-colors duration-300 font-mono block mb-4">
+              <span className="text-5xl font-extrabold font-mono block mb-4 transition-colors duration-300" style={{ color: "var(--border-color)" }}>
                 {step.n}
               </span>
               <p className="text-2xl mb-4">{step.icon}</p>
-              <h3 className="text-base font-bold text-white mb-2">{step.title}</h3>
-              <p className="text-sm text-neutral-500 leading-relaxed">{step.body}</p>
+              <h3 className="text-base font-bold mb-2" style={{ color: "var(--foreground)" }}>{step.title}</h3>
+              <p className="text-sm leading-relaxed" style={{ color: "var(--foreground)", opacity: 0.5 }}>{step.body}</p>
               <motion.div
-                className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#00ff88] origin-left"
+                className="absolute bottom-0 left-0 right-0 h-[2px] origin-left"
+                style={{ background: "var(--accent)" }}
                 initial={{ scaleX: 0 }}
                 whileInView={{ scaleX: 1 }}
                 viewport={{ once: true }}
@@ -383,15 +421,15 @@ const AboutPage = () => {
       </section>
 
       {/* ── VALUES ── */}
-      <section className="w-[82%] mx-auto py-16 border-t border-[#2a2e2a]">
+      <section className="w-[82%] mx-auto py-16" style={{ borderTop: "1px solid var(--border-color)" }}>
         <motion.div {...fadeUp()} className="mb-12">
-          <p className="text-xs font-bold text-[#00ff88] uppercase tracking-widest mb-3">Our Principles</p>
-          <h2 className="text-3xl sm:text-4xl font-extrabold">What we won&apos;t compromise on.</h2>
+          <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "var(--accent)" }}>Our Principles</p>
+          <h2 className="text-3xl sm:text-4xl font-extrabold" style={{ color: "var(--foreground)" }}>What we won&apos;t compromise on.</h2>
         </motion.div>
 
         <div className="grid sm:grid-cols-3 gap-5">
           {[
-            { icon: "🔒", title: "Privacy first", body: "Zero storage. Zero logging. Your contract never leaves your session. We process in memory and discard immediately.", accent: "#00ff88" },
+            { icon: "🔒", title: "Privacy first", body: "Zero storage. Zero logging. Your contract never leaves your session. We process in memory and discard immediately.", accent: "var(--accent)" },
             { icon: "⚡", title: "Speed matters", body: "Analysis in seconds, not minutes. Because time is one thing you can&apos;t get back when a deadline is closing in.", accent: "#00aaff" },
             { icon: "🎯", title: "Clarity over jargon", body: "Legal language stays legal. Our explanations don&apos;t. You shouldn&apos;t need a law degree to understand your own risk.", accent: "#ff9900" },
           ].map((v, i) => (
@@ -402,26 +440,27 @@ const AboutPage = () => {
               viewport={{ once: true }}
               transition={{ delay: i * 0.12, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
               whileHover={{ y: -5 }}
-              className="group relative p-8 rounded-2xl border border-[#2a2e2a] bg-[#111411] transition-all duration-300 overflow-hidden"
+              className="group relative p-8 rounded-2xl transition-all duration-300 overflow-hidden"
+              style={{ border: "1px solid var(--border-color)", background: "var(--surface-strong)" }}
             >
               <motion.div
                 className="absolute top-0 left-0 right-0 h-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                 style={{ background: v.accent }}
               />
               <p className="text-3xl mb-5">{v.icon}</p>
-              <h3 className="text-lg font-bold text-white mb-3">{v.title}</h3>
-              <p className="text-sm text-neutral-500 leading-relaxed">{v.body}</p>
+              <h3 className="text-lg font-bold mb-3" style={{ color: "var(--foreground)" }}>{v.title}</h3>
+              <p className="text-sm leading-relaxed" style={{ color: "var(--foreground)", opacity: 0.5 }}>{v.body}</p>
             </motion.div>
           ))}
         </div>
       </section>
 
       {/* ── TEAM ── */}
-      <section className="w-[82%] mx-auto py-16 border-t border-[#2a2e2a]">
+      <section className="w-[82%] mx-auto py-16" style={{ borderTop: "1px solid var(--border-color)" }}>
         <motion.div {...fadeUp()} className="mb-12">
-          <p className="text-xs font-bold text-[#00ff88] uppercase tracking-widest mb-3">The Team</p>
-          <h2 className="text-3xl sm:text-4xl font-extrabold">Small crew. Sharp tools.</h2>
-          <p className="text-neutral-500 text-sm mt-3 max-w-lg">
+          <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "var(--accent)" }}>The Team</p>
+          <h2 className="text-3xl sm:text-4xl font-extrabold" style={{ color: "var(--foreground)" }}>Small crew. Sharp tools.</h2>
+          <p className="text-sm mt-3 max-w-lg" style={{ color: "var(--foreground)", opacity: 0.5 }}>
             Built by people who got tired of bad legal-tech and decided to fix it themselves.
           </p>
         </motion.div>
@@ -438,27 +477,28 @@ const AboutPage = () => {
               key={member.name}
               variants={staggerChild}
               whileHover={{ y: -6, scale: 1.02 }}
-              className="flex flex-col items-center text-center p-6 rounded-2xl border border-[#2a2e2a] bg-[#111411] transition-all duration-300 cursor-default"
+              className="flex flex-col items-center text-center p-6 rounded-2xl transition-all duration-300 cursor-default"
+              style={{ border: "1px solid var(--border-color)", background: "var(--surface-strong)" }}
             >
               <motion.div
                 className="w-14 h-14 rounded-full flex items-center justify-center text-sm font-extrabold mb-4 border-2 transition-all duration-300"
-                style={{ background: `${member.color}15`, borderColor: `${member.color}30`, color: member.color }}
+                style={{ background: `${member.color}15`, borderColor: `${member.color}40`, color: member.color }}
                 whileHover={{ scale: 1.12 }}
               >
                 {member.abbr}
               </motion.div>
-              <p className="text-sm font-bold text-white">{member.name}</p>
-              <p className="text-xs text-neutral-500 mt-1 leading-snug">{member.role}</p>
+              <p className="text-sm font-bold" style={{ color: "var(--foreground)" }}>{member.name}</p>
+              <p className="text-xs mt-1 leading-snug" style={{ color: "var(--foreground)", opacity: 0.5 }}>{member.role}</p>
             </motion.div>
           ))}
         </motion.div>
       </section>
 
       {/* ── FAQ ── */}
-      <section className="w-[82%] mx-auto py-16 border-t border-[#2a2e2a]">
+      <section className="w-[82%] mx-auto py-16" style={{ borderTop: "1px solid var(--border-color)" }}>
         <motion.div {...fadeUp()} className="mb-10">
-          <p className="text-xs font-bold text-[#00ff88] uppercase tracking-widest mb-3">FAQ</p>
-          <h2 className="text-3xl sm:text-4xl font-extrabold">Questions, answered.</h2>
+          <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "var(--accent)" }}>FAQ</p>
+          <h2 className="text-3xl sm:text-4xl font-extrabold" style={{ color: "var(--foreground)" }}>Questions, answered.</h2>
         </motion.div>
         <div className="grid lg:grid-cols-2 gap-3">
           {FAQ_DATA.map((item, i) => (
@@ -471,15 +511,19 @@ const AboutPage = () => {
       <section className="w-[82%] mx-auto py-16">
         <motion.div
           {...fadeUp()}
-          className="relative overflow-hidden rounded-3xl border border-[#00ff88]/20 bg-[#0c120c] p-10 sm:p-16 flex flex-col items-center text-center"
+          className="relative overflow-hidden rounded-3xl p-10 sm:p-16 flex flex-col items-center text-center"
+          style={{ border: "1px solid var(--border-color)", background: "var(--surface-muted)" }}
         >
           <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[280px] bg-[#00ff88]/6 rounded-full blur-[80px]" />
+            <div
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[280px] rounded-full blur-[80px]"
+              style={{ background: "var(--accent-muted)" }}
+            />
           </div>
           <div
             className="absolute inset-0 opacity-[0.04] pointer-events-none"
             style={{
-              backgroundImage: "linear-gradient(#00ff88 1px, transparent 1px), linear-gradient(90deg, #00ff88 1px, transparent 1px)",
+              backgroundImage: "linear-gradient(var(--accent) 1px, transparent 1px), linear-gradient(90deg, var(--accent) 1px, transparent 1px)",
               backgroundSize: "40px 40px",
             }}
           />
@@ -488,10 +532,10 @@ const AboutPage = () => {
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
             className="text-5xl mb-6 relative z-10"
           >⚡</motion.div>
-          <h2 className="relative z-10 text-3xl sm:text-5xl font-extrabold mb-4 leading-tight">
+          <h2 className="relative z-10 text-3xl sm:text-5xl font-extrabold mb-4 leading-tight" style={{ color: "var(--foreground)" }}>
             Ready to read the fine print?
           </h2>
-          <p className="relative z-10 text-neutral-400 text-sm sm:text-base leading-relaxed mb-8 max-w-xl">
+          <p className="relative z-10 text-sm sm:text-base leading-relaxed mb-8 max-w-xl" style={{ color: "var(--foreground)", opacity: 0.6 }}>
             Upload your contracts and get a full risk analysis — free, instant, and private.
             No account needed.
           </p>
@@ -499,7 +543,8 @@ const AboutPage = () => {
             href="/"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.97 }}
-            className="relative z-10 inline-flex items-center gap-2 px-10 py-4 bg-[#00ff88] text-black font-extrabold rounded-2xl text-sm hover:bg-[#00ee77] transition-colors"
+            className="relative z-10 inline-flex items-center gap-2 px-10 py-4 font-extrabold rounded-2xl text-sm transition-colors"
+            style={{ background: "var(--accent)", color: "#fff" }}
           >
             Analyze a Contract
             <motion.span
@@ -516,10 +561,11 @@ const AboutPage = () => {
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 0.6 }}
-        className="py-10 text-center text-neutral-700 text-xs border-t border-[#2a2e2a]"
+        className="py-10 text-center text-xs"
+        style={{ borderTop: "1px solid var(--border-color)", color: "var(--foreground)", opacity: 0.35 }}
       >
         Built with sleepless nights and a healthy fear of bad contracts ·{" "}
-        <span className="text-[#00ff88]/30">ClauseLens</span> © {new Date().getFullYear()}
+        <span style={{ color: "var(--accent)", opacity: 0.5 }}>ClauseLens</span> © {new Date().getFullYear()}
       </motion.footer>
     </main>
   );
