@@ -64,7 +64,10 @@ const ClauseLensPage = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-[#0a0a0a] text-white">
+    <div
+      className="min-h-[calc(100vh-64px)]"
+      style={{ background: "var(--background)", color: "var(--foreground)" }}
+    >
       <AnimatePresence mode="wait">
         {/* ── UPLOAD ── */}
         {step === "upload" && (
@@ -78,13 +81,27 @@ const ClauseLensPage = () => {
           >
             {/* Hero */}
             <div className="text-center space-y-3">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#00ff88]/20 bg-[#00ff88]/5 text-[#00ff88] text-xs font-semibold tracking-widest uppercase">
+              <div
+                className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold tracking-widest uppercase"
+                style={{
+                  border: "1px solid var(--border-color)",
+                  background: "var(--accent-muted)",
+                  color: "var(--accent)",
+                }}
+              >
                 AI-Powered
               </div>
-              <h1 className="text-3xl sm:text-4xl font-bold text-white leading-tight">
-                Contract <span className="text-[#00ff88]">Analysis</span>
+              <h1
+                className="text-3xl sm:text-4xl font-bold leading-tight"
+                style={{ color: "var(--foreground)" }}
+              >
+                Contract{" "}
+                <span style={{ color: "var(--accent)" }}>Analysis</span>
               </h1>
-              <p className="text-neutral-400 text-sm max-w-md mx-auto leading-relaxed">
+              <p
+                className="text-sm max-w-md mx-auto leading-relaxed"
+                style={{ color: "var(--foreground)", opacity: 0.6 }}
+              >
                 Upload two versions of a contract. Get every change detected,
                 risk-scored, and explained in plain English.
               </p>
@@ -100,10 +117,17 @@ const ClauseLensPage = () => {
               ].map((f) => (
                 <div
                   key={f.label}
-                  className="p-3 rounded-lg border border-[#2a2e2a] bg-[#111411]"
+                  className="p-3 rounded-lg"
+                  style={{
+                    border: "1px solid var(--border-color)",
+                    background: "var(--surface-strong)",
+                  }}
                 >
                   <p className="text-lg mb-1">{f.icon}</p>
-                  <p className="text-xs text-neutral-400 font-medium">
+                  <p
+                    className="text-xs font-medium"
+                    style={{ color: "var(--foreground)", opacity: 0.6 }}
+                  >
                     {f.label}
                   </p>
                 </div>
@@ -130,18 +154,28 @@ const ClauseLensPage = () => {
               <motion.div
                 initial={{ opacity: 0, scale: 0.97 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="max-w-lg mx-auto border border-red-500/30 bg-red-500/5 rounded-xl p-10 text-center space-y-4 mt-12"
+                className="max-w-lg mx-auto rounded-xl p-10 text-center space-y-4 mt-12"
+                style={{
+                  border: "1px solid rgba(239,68,68,0.3)",
+                  background: "rgba(239,68,68,0.05)",
+                }}
               >
                 <p className="text-4xl">⚠️</p>
-                <p className="text-red-400 font-semibold text-lg">
+                <p className="text-red-500 font-semibold text-lg">
                   Analysis Failed
                 </p>
-                <p className="text-neutral-400 text-sm">{error}</p>
+                <p
+                  className="text-sm"
+                  style={{ color: "var(--foreground)", opacity: 0.6 }}
+                >
+                  {error}
+                </p>
                 <motion.button
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={handleReset}
-                  className="px-6 py-2.5 bg-[#00ff88] text-black font-semibold rounded-lg hover:bg-[#00dd77] transition-colors text-sm"
+                  className="px-6 py-2.5 font-semibold rounded-lg text-sm transition-colors"
+                  style={{ background: "var(--accent)", color: "#fff" }}
                 >
                   Try Again
                 </motion.button>
@@ -150,23 +184,40 @@ const ClauseLensPage = () => {
               <>
                 {/* Toolbar */}
                 <div
-                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 rounded-xl border border-[#2a2e2a] bg-[#111411]"
-                  style={{ fontSize: `${zoom / 100}em` }}
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 rounded-xl"
+                  style={{
+                    border: "1px solid var(--border-color)",
+                    background: "var(--surface-strong)",
+                    fontSize: `${zoom / 100}em`,
+                  }}
                 >
                   {/* Left: summary */}
                   <div className="flex items-center gap-3">
                     <span
                       className={`text-xs font-bold px-2.5 py-1 rounded-full border ${
                         analysisData.overall_risk === "HIGH"
-                          ? "text-red-400 border-red-400/30 bg-red-400/10"
+                          ? "text-red-500 border-red-400/30 bg-red-400/10"
                           : analysisData.overall_risk === "MODERATE"
-                            ? "text-yellow-400 border-yellow-400/30 bg-yellow-400/10"
-                            : "text-[#00ff88] border-[#00ff88]/30 bg-[#00ff88]/10"
+                            ? "text-yellow-500 border-yellow-400/30 bg-yellow-400/10"
+                            : ""
                       }`}
+                      style={
+                        analysisData.overall_risk !== "HIGH" &&
+                        analysisData.overall_risk !== "MODERATE"
+                          ? {
+                              color: "var(--accent)",
+                              border: "1px solid var(--border-color)",
+                              background: "var(--accent-muted)",
+                            }
+                          : {}
+                      }
                     >
                       {analysisData.overall_risk} RISK
                     </span>
-                    <span className="text-xs text-neutral-500">
+                    <span
+                      className="text-xs"
+                      style={{ color: "var(--foreground)", opacity: 0.5 }}
+                    >
                       {analysisData.summary}
                     </span>
                   </div>
@@ -174,22 +225,33 @@ const ClauseLensPage = () => {
                   {/* Right: zoom + downloads + reset */}
                   <div className="flex flex-wrap items-center gap-2">
                     {/* Zoom */}
-                    <div className="flex items-center gap-1 border border-[#2a2e2a] rounded-lg overflow-hidden">
+                    <div
+                      className="flex items-center gap-1 rounded-lg overflow-hidden"
+                      style={{ border: "1px solid var(--border-color)" }}
+                    >
                       <button
                         onClick={zoomOut}
-                        className="px-2.5 py-1.5 text-neutral-400 hover:text-[#00ff88] hover:bg-[#00ff88]/5 transition-all text-xs"
+                        className="px-2.5 py-1.5 transition-all text-xs"
+                        style={{ color: "var(--foreground)", opacity: 0.6 }}
                       >
                         <ZoomOut className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={zoomReset}
-                        className="px-2.5 py-1.5 text-neutral-500 hover:text-white text-xs font-mono border-x border-[#2a2e2a] min-w-[42px] text-center"
+                        className="px-2.5 py-1.5 text-xs font-mono min-w-[42px] text-center"
+                        style={{
+                          color: "var(--foreground)",
+                          opacity: 0.5,
+                          borderLeft: "1px solid var(--border-color)",
+                          borderRight: "1px solid var(--border-color)",
+                        }}
                       >
                         {zoom}%
                       </button>
                       <button
                         onClick={zoomIn}
-                        className="px-2.5 py-1.5 text-neutral-400 hover:text-[#00ff88] hover:bg-[#00ff88]/5 transition-all text-xs"
+                        className="px-2.5 py-1.5 transition-all text-xs"
+                        style={{ color: "var(--foreground)", opacity: 0.6 }}
                       >
                         <ZoomIn className="w-3.5 h-3.5" />
                       </button>
@@ -201,7 +263,13 @@ const ClauseLensPage = () => {
                       whileHover={{ scale: 1.03 }}
                       whileTap={{ scale: 0.97 }}
                       onClick={handleReset}
-                      className="flex items-center gap-1.5 px-3 py-2 border border-[#2a2e2a] text-neutral-400 rounded-lg text-xs font-semibold hover:border-[#00ff88]/30 hover:text-[#00ff88] transition-all"
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all"
+                      style={{
+                        border: "1px solid var(--border-color)",
+                        color: "var(--foreground)",
+                        background: "transparent",
+                        opacity: 0.7,
+                      }}
                     >
                       <RotateCcw className="w-3 h-3" /> New Upload
                     </motion.button>
