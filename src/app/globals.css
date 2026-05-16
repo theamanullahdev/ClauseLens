@@ -49,77 +49,25 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-body[data-theme="light"] .bg-black {
-  background-color: var(--surface) !important;
-}
-
-body[data-theme="light"] .bg-\[\#0a0a0a\] {
-  background-color: var(--surface) !important;
-}
-
-body[data-theme="light"] .bg-\[\#111411\] {
-  background-color: var(--surface-strong) !important;
-}
-
-body[data-theme="light"] .bg-\[\#0c0f0c\] {
-  background-color: var(--surface-muted) !important;
-}
-
-body[data-theme="light"] .bg-\[\#0d110d\] {
-  background-color: #f6faf3 !important;
-}
-
+/* ── Light mode: any hardcoded dark bg overrides ── */
+body[data-theme="light"] .bg-\[\#0a0a0a\],
+body[data-theme="light"] .bg-black,
+body[data-theme="light"] .bg-\[\#111411\],
+body[data-theme="light"] .bg-\[\#0c0f0c\],
+body[data-theme="light"] .bg-\[\#0d110d\],
 body[data-theme="light"] .bg-\[\#0c120c\] {
-  background-color: #effbf0 !important;
+  background-color: var(--surface) !important;
 }
 
-body[data-theme="light"] .bg-\[\#00ff88\]\/5 {
-  background-color: rgba(0, 136, 68, 0.08) !important;
+/* Loading screen override */
+body[data-theme="light"] .bg-black.text-white {
+  background-color: var(--surface) !important;
+  color: var(--foreground) !important;
 }
 
-body[data-theme="light"] .bg-\[\#00ff88\]\/10 {
-  background-color: rgba(0, 136, 68, 0.1) !important;
-}
-
-body[data-theme="light"] .border-\[\#2a2e2a\] {
-  border-color: var(--border-color) !important;
-}
-
-body[data-theme="light"] .border-\[\#c0dcc0\] {
-  border-color: var(--border-color) !important;
-}
-
-body[data-theme="light"] .border-\[\#00ff88\]\/20 {
-  border-color: rgba(0, 136, 68, 0.2) !important;
-}
-
-body[data-theme="light"] .border-\[\#00ff88\]\/30 {
-  border-color: rgba(0, 136, 68, 0.3) !important;
-}
-
-body[data-theme="light"] .border-\[\#00ff88\]\/40 {
-  border-color: rgba(0, 136, 68, 0.4) !important;
-}
-
-body[data-theme="light"] .bg-\[\#00ff88\] {
-  background-color: #008844 !important;
-}
-
-body[data-theme="light"] .bg-\[\#008844\] {
-  background-color: #008844 !important;
-}
-
-body[data-theme="light"] .bg-\[\#00ee77\] {
-  background-color: #00dd77 !important;
-}
-
-body[data-theme="light"] .bg-black .text-white,
-body[data-theme="light"] .bg-\[\#0a0a0a\] .text-white,
-body[data-theme="light"] .bg-\[\#111411\] .text-white,
-body[data-theme="light"] .bg-\[\#0c0f0c\] .text-white,
-body[data-theme="light"] .bg-\[\#0d110d\] .text-white,
-body[data-theme="light"] .bg-\[\#0c120c\] .text-white {
-  color: #111827 !important;
+/* ── Text overrides ── */
+body[data-theme="light"] .text-white {
+  color: var(--foreground) !important;
 }
 
 body[data-theme="light"] .text-\[\#00ff88\] {
@@ -141,6 +89,67 @@ body[data-theme="light"] .text-neutral-600 {
 body[data-theme="light"] .text-neutral-700 {
   color: #374151 !important;
 }
+
+/* ── Border overrides ── */
+body[data-theme="light"] .border-\[\#2a2e2a\] {
+  border-color: var(--border-color) !important;
+}
+
+body[data-theme="light"] .border-\[\#00ff88\]\/20 {
+  border-color: rgba(0, 136, 68, 0.2) !important;
+}
+
+body[data-theme="light"] .border-\[\#00ff88\]\/30 {
+  border-color: rgba(0, 136, 68, 0.3) !important;
+}
+
+body[data-theme="light"] .border-\[\#00ff88\]\/40 {
+  border-color: rgba(0, 136, 68, 0.4) !important;
+}
+
+/* ── Accent bg overrides ── */
+body[data-theme="light"] .bg-\[\#00ff88\]\/5,
+body[data-theme="light"] .bg-\[\#00ff88\]\/8,
+body[data-theme="light"] .bg-\[\#00ff88\]\/10 {
+  background-color: var(--accent-muted) !important;
+}
+
+body[data-theme="light"] .bg-\[\#00ff88\] {
+  background-color: var(--accent) !important;
+}
+
+body[data-theme="light"] .hover\:bg-\[\#00ee77\]:hover,
+body[data-theme="light"] .hover\:bg-\[\#00dd77\]:hover {
+  background-color: #007733 !important;
+}
+
+/* ── Zoom toolbar & results panel ── */
+body[data-theme="light"] .hover\:text-\[\#00ff88\]:hover {
+  color: var(--accent) !important;
+}
+
+body[data-theme="light"] .hover\:border-\[\#00ff88\]\/30:hover {
+  border-color: rgba(0, 136, 68, 0.3) !important;
+}
+
+body[data-theme="light"] .hover\:bg-\[\#00ff88\]\/5:hover {
+  background-color: var(--accent-muted) !important;
+}
+
+/* ── Risk badge overrides ── */
+body[data-theme="light"] .bg-\[\#00ff88\]\/10 {
+  background-color: rgba(0, 136, 68, 0.1) !important;
+}
+
+body[data-theme="light"] .bg-red-400\/10 {
+  background-color: rgba(239, 68, 68, 0.08) !important;
+}
+
+body[data-theme="light"] .bg-yellow-400\/10 {
+  background-color: rgba(234, 179, 8, 0.08) !important;
+}
+
+/* ── Scrollbar ── */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
@@ -149,16 +158,15 @@ body[data-theme="light"] .text-neutral-700 {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-/* globals.css */
 
+/* ── Glow animation ── */
 @keyframes glowFade {
   0%,
   100% {
     text-shadow: 0 0 6px rgba(0, 255, 255, 0.3), 0 0 20px rgba(0, 255, 255, 0.2);
   }
   50% {
-    text-shadow: 0 0 12px rgba(0, 255, 255, 0.5),
-      0 0 30px rgba(0, 255, 255, 0.3);
+    text-shadow: 0 0 12px rgba(0, 255, 255, 0.5), 0 0 30px rgba(0, 255, 255, 0.3);
   }
 }
 
