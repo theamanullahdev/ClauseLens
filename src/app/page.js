@@ -14,21 +14,11 @@ const Particles = () => {
   const [particles, setParticles] = useState([]);
 
   useEffect(() => {
-    // generate all random values only after mount (client side)
     const newParticles = [...Array(28)].map((_, i) => ({
       size: Math.random() * 3 + 1,
       left: Math.random() * 100,
       top: Math.random() * 100,
-      color:
-        i % 5 === 0
-          ? "#00ff88"
-          : i % 5 === 1
-            ? "#00aaff"
-            : i % 5 === 2
-              ? "#00ff88"
-              : i % 5 === 3
-                ? "#ffffff"
-                : "#00ff88",
+      colorKey: i % 3,
       opacity: 0.04 + Math.random() * 0.1,
       dur: 6 + Math.random() * 8,
       delay: Math.random() * 6,
@@ -37,7 +27,7 @@ const Particles = () => {
     setParticles(newParticles);
   }, []);
 
-  if (particles.length === 0) return null; // avoid flash of empty
+  if (particles.length === 0) return null;
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -50,7 +40,7 @@ const Particles = () => {
             height: p.size,
             left: `${p.left}%`,
             top: `${p.top}%`,
-            background: p.color,
+            background: "var(--accent)",
             opacity: p.opacity,
           }}
           animate={{
@@ -69,9 +59,24 @@ const Particles = () => {
   );
 };
 
+/* ─── scan line effect ─── */
+function ScanLines() {
+  return (
+    <div
+      className="absolute inset-0 pointer-events-none"
+      style={{
+        opacity: 0.015,
+        backgroundImage:
+          "repeating-linear-gradient(0deg, var(--accent) 0px, var(--accent) 1px, transparent 1px, transparent 3px)",
+        backgroundSize: "100% 3px",
+      }}
+    />
+  );
+}
+
 /* ─── animated word cycler ─── */
 const WORDS = ["Dangerous.", "Confusing.", "Expensive.", "Clear."];
-const WORD_COLORS = ["#ff4444", "#ff9900", "#ffdd00", "#00ff88"];
+const WORD_COLORS = ["#ff4444", "#ff9900", "#ffdd00", "var(--accent)"];
 
 function WordCycler() {
   const [idx, setIdx] = useState(0);
@@ -99,21 +104,24 @@ function WordCycler() {
           {WORDS[idx]}
         </motion.span>
       </AnimatePresence>
-      {/* invisible placeholder to reserve height */}
       <span className="invisible font-extrabold">{WORDS[0]}</span>
     </span>
   );
 }
 
 /* ─── risk badge ─── */
-function RiskBadge({ level, color, bg, border, delay }) {
+function RiskBadge({ level, color, bgColor, borderColor, delay }) {
   return (
     <motion.span
       initial={{ opacity: 0, scale: 0.7 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ delay, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border font-mono text-xs font-extrabold uppercase tracking-wider"
-      style={{ color, background: bg, borderColor: border }}
+      style={{
+        color,
+        background: bgColor,
+        borderColor,
+      }}
     >
       <motion.span
         className="w-1.5 h-1.5 rounded-full"
@@ -134,14 +142,18 @@ function StepCard({ number, title, body, icon, delay, accent }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{ delay, duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-      whileHover={{ y: -6, borderColor: `${accent}55` }}
-      className="group relative flex flex-col gap-5 p-8 rounded-3xl border border-[#1e241e] bg-[#0d110d] transition-all duration-400 overflow-hidden"
+      whileHover={{ y: -6 }}
+      className="group relative flex flex-col gap-5 p-8 rounded-3xl transition-all duration-400 overflow-hidden"
+      style={{
+        border: "1px solid var(--border-color)",
+        background: "var(--surface-strong)",
+      }}
     >
       {/* hover glow */}
       <div
         className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-3xl"
         style={{
-          background: `radial-gradient(ellipse at 30% 0%, ${accent}08 0%, transparent 65%)`,
+          background: `radial-gradient(ellipse at 30% 0%, ${accent}12 0%, transparent 65%)`,
         }}
       />
       {/* top accent bar */}
@@ -152,11 +164,10 @@ function StepCard({ number, title, body, icon, delay, accent }) {
         }}
       />
 
-      {/* step number */}
       <div className="flex items-center justify-between">
         <span
-          className="text-[11px] font-mono font-extrabold uppercase tracking-[0.2em] opacity-40"
-          style={{ color: accent }}
+          className="text-[11px] font-mono font-extrabold uppercase tracking-[0.2em]"
+          style={{ color: accent, opacity: 0.6 }}
         >
           Step {number}
         </span>
@@ -164,28 +175,20 @@ function StepCard({ number, title, body, icon, delay, accent }) {
       </div>
 
       <div>
-        <h3 className="text-xl font-extrabold text-white mb-2 leading-snug">
+        <h3
+          className="text-xl font-extrabold mb-2 leading-snug"
+          style={{ color: "var(--foreground)" }}
+        >
           {title}
         </h3>
-        <p className="text-sm text-neutral-500 leading-relaxed">{body}</p>
+        <p
+          className="text-sm leading-relaxed"
+          style={{ color: "var(--foreground)", opacity: 0.5 }}
+        >
+          {body}
+        </p>
       </div>
-
-      {/* bottom connector line (not on last) */}
     </motion.div>
-  );
-}
-
-/* ─── scan line effect ─── */
-function ScanLines() {
-  return (
-    <div
-      className="absolute inset-0 pointer-events-none opacity-[0.015]"
-      style={{
-        backgroundImage:
-          "repeating-linear-gradient(0deg, #00ff88 0px, #00ff88 1px, transparent 1px, transparent 3px)",
-        backgroundSize: "100% 3px",
-      }}
-    />
   );
 }
 
@@ -196,22 +199,22 @@ function DemoMockup() {
       text: "§4.2 Liability cap removed — unlimited exposure",
       risk: "CRITICAL",
       color: "#ff4444",
-      bg: "#ff44440d",
-      border: "#ff444425",
+      bg: "rgba(255,68,68,0.06)",
+      border: "rgba(255,68,68,0.18)",
     },
     {
       text: "§7.1 Payment terms: Net-30 → Net-7",
       risk: "MODERATE",
       color: "#ffaa00",
-      bg: "#ffaa000d",
-      border: "#ffaa0025",
+      bg: "rgba(255,170,0,0.06)",
+      border: "rgba(255,170,0,0.18)",
     },
     {
       text: "§12 Jurisdiction changed to Delaware",
       risk: "MINOR",
-      color: "#00ff88",
-      bg: "#00ff880d",
-      border: "#00ff8825",
+      color: "var(--accent)",
+      bg: "var(--accent-muted)",
+      border: "var(--border-color)",
     },
   ];
 
@@ -223,15 +226,37 @@ function DemoMockup() {
       className="relative w-full max-w-md mx-auto"
     >
       {/* glow behind card */}
-      <div className="absolute -inset-4 bg-[#00ff88]/5 rounded-3xl blur-2xl pointer-events-none" />
+      <div
+        className="absolute -inset-4 rounded-3xl blur-2xl pointer-events-none"
+        style={{ background: "var(--accent-muted)" }}
+      />
 
-      <div className="relative rounded-2xl border border-[#1e2a1e] bg-[#0a0f0a] overflow-hidden shadow-2xl shadow-black/60">
+      <div
+        className="relative rounded-2xl overflow-hidden"
+        style={{
+          border: "1px solid var(--border-color)",
+          background: "var(--surface-strong)",
+          boxShadow: "0 25px 60px rgba(0,0,0,0.25)",
+        }}
+      >
         {/* top bar */}
-        <div className="flex items-center gap-2 px-4 py-3 border-b border-[#1a201a] bg-[#080c08]">
+        <div
+          className="flex items-center gap-2 px-4 py-3"
+          style={{
+            borderBottom: "1px solid var(--border-color)",
+            background: "var(--surface-muted)",
+          }}
+        >
           <div className="w-3 h-3 rounded-full bg-[#ff5f57]" />
           <div className="w-3 h-3 rounded-full bg-[#febc2e]" />
-          <div className="w-3 h-3 rounded-full bg-[#28c840]" />
-          <span className="ml-3 text-[10px] font-mono text-neutral-600 tracking-wider">
+          <div
+            className="w-3 h-3 rounded-full"
+            style={{ background: "var(--accent)", opacity: 0.7 }}
+          />
+          <span
+            className="ml-3 text-[10px] font-mono tracking-wider"
+            style={{ color: "var(--foreground)", opacity: 0.4 }}
+          >
             clauselens — analysis.json
           </span>
 
@@ -239,9 +264,13 @@ function DemoMockup() {
             <motion.span
               animate={{ opacity: [1, 0.2, 1] }}
               transition={{ duration: 1.2, repeat: Infinity }}
-              className="w-1.5 h-1.5 rounded-full bg-[#00ff88]"
+              className="w-1.5 h-1.5 rounded-full"
+              style={{ background: "var(--accent)" }}
             />
-            <span className="text-[9px] font-mono text-[#00ff88]/50 uppercase tracking-widest">
+            <span
+              className="text-[9px] font-mono uppercase tracking-widest"
+              style={{ color: "var(--accent)", opacity: 0.6 }}
+            >
               Live
             </span>
           </div>
@@ -249,22 +278,25 @@ function DemoMockup() {
 
         {/* header row */}
         <div className="px-4 pt-4 pb-2 flex items-center justify-between">
-          <span className="text-[10px] font-mono text-neutral-600 uppercase tracking-widest">
+          <span
+            className="text-[10px] font-mono uppercase tracking-widest"
+            style={{ color: "var(--foreground)", opacity: 0.4 }}
+          >
             3 Changes Detected
           </span>
           <div className="flex gap-1.5">
             <RiskBadge
               level="CRITICAL"
               color="#ff4444"
-              bg="#ff44441a"
-              border="#ff444440"
+              bgColor="rgba(255,68,68,0.1)"
+              borderColor="rgba(255,68,68,0.3)"
               delay={0.9}
             />
             <RiskBadge
               level="1 MODERATE"
               color="#ffaa00"
-              bg="#ffaa001a"
-              border="#ffaa0040"
+              bgColor="rgba(255,170,0,0.1)"
+              borderColor="rgba(255,170,0,0.3)"
               delay={1.0}
             />
           </div>
@@ -291,7 +323,10 @@ function DemoMockup() {
               >
                 {c.risk}
               </span>
-              <span className="text-xs text-neutral-400 leading-relaxed">
+              <span
+                className="text-xs leading-relaxed"
+                style={{ color: "var(--foreground)", opacity: 0.65 }}
+              >
                 {c.text}
               </span>
             </motion.div>
@@ -303,12 +338,19 @@ function DemoMockup() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.6, duration: 0.6 }}
-          className="border-t border-[#1a201a] px-4 py-3 flex items-center justify-between bg-[#080c08]"
+          className="flex items-center justify-between px-4 py-3"
+          style={{
+            borderTop: "1px solid var(--border-color)",
+            background: "var(--surface-muted)",
+          }}
         >
-          <span className="text-[10px] text-neutral-600 font-mono">
+          <span
+            className="text-[10px] font-mono"
+            style={{ color: "var(--foreground)", opacity: 0.4 }}
+          >
             Recommendation
           </span>
-          <span className="text-xs font-extrabold text-red-400 font-mono">
+          <span className="text-xs font-extrabold font-mono text-red-400">
             ⚠ Do not sign — review first
           </span>
         </motion.div>
@@ -331,8 +373,12 @@ export default function HomePage() {
 
   return (
     <main
-      className="bg-[#080c08] min-h-screen text-white overflow-x-hidden"
-      style={{ fontFamily: "'DM Mono', 'Fira Mono', monospace" }}
+      className="min-h-screen overflow-x-hidden"
+      style={{
+        background: "var(--background)",
+        color: "var(--foreground)",
+        fontFamily: "'DM Mono', 'Fira Mono', monospace",
+      }}
     >
       {/* ══════════ SECTION 1: HERO ══════════ */}
       <section
@@ -343,14 +389,28 @@ export default function HomePage() {
         <ScanLines />
 
         {/* radial glows */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-[#00ff88]/4 rounded-full blur-[160px] pointer-events-none" />
-        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-[#00aaff]/3 rounded-full blur-[120px] pointer-events-none" />
+        <div
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-full blur-[160px] pointer-events-none"
+          style={{ background: "var(--accent-muted)" }}
+        />
+        <div
+          className="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full blur-[120px] pointer-events-none"
+          style={{ background: "rgba(0,170,255,0.04)" }}
+        />
 
-        {/* corner brackets — decorative */}
-        <div className="absolute top-8 left-8 w-8 h-8 border-t-2 border-l-2 border-[#00ff88]/20 pointer-events-none" />
-        <div className="absolute top-8 right-8 w-8 h-8 border-t-2 border-r-2 border-[#00ff88]/20 pointer-events-none" />
-        <div className="absolute bottom-8 left-8 w-8 h-8 border-b-2 border-l-2 border-[#00ff88]/20 pointer-events-none" />
-        <div className="absolute bottom-8 right-8 w-8 h-8 border-b-2 border-r-2 border-[#00ff88]/20 pointer-events-none" />
+        {/* corner brackets */}
+        {[
+          "top-8 left-8 border-t-2 border-l-2",
+          "top-8 right-8 border-t-2 border-r-2",
+          "bottom-8 left-8 border-b-2 border-l-2",
+          "bottom-8 right-8 border-b-2 border-r-2",
+        ].map((cls, i) => (
+          <div
+            key={i}
+            className={`absolute w-8 h-8 pointer-events-none ${cls}`}
+            style={{ borderColor: "var(--accent)", opacity: 0.2 }}
+          />
+        ))}
 
         {/* LEFT: copy */}
         <motion.div
@@ -362,10 +422,16 @@ export default function HomePage() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="self-start flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#00ff88]/20 bg-[#00ff88]/6 text-[#00ff88] text-[10px] font-bold tracking-[0.2em] uppercase mb-8"
+            className="self-start flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-bold tracking-[0.2em] uppercase mb-8"
+            style={{
+              border: "1px solid var(--border-color)",
+              background: "var(--accent-muted)",
+              color: "var(--accent)",
+            }}
           >
             <motion.span
-              className="w-1.5 h-1.5 rounded-full bg-[#00ff88]"
+              className="w-1.5 h-1.5 rounded-full"
+              style={{ background: "var(--accent)" }}
               animate={{ opacity: [1, 0.2, 1] }}
               transition={{ duration: 1.4, repeat: Infinity }}
             />
@@ -376,12 +442,9 @@ export default function HomePage() {
           <motion.h1
             initial={{ opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: 0.75,
-              delay: 0.2,
-              ease: [0.22, 1, 0.36, 1],
-            }}
+            transition={{ duration: 0.75, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
             className="text-5xl sm:text-6xl xl:text-7xl font-extrabold leading-[1.0] tracking-tight mb-4"
+            style={{ color: "var(--foreground)", fontFamily: "system-ui, sans-serif" }}
           >
             Contracts are
             <br />
@@ -393,8 +456,12 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.45 }}
-            className="text-neutral-400 text-base sm:text-lg leading-relaxed mb-10 max-w-md"
-            style={{ fontFamily: "system-ui, sans-serif" }}
+            className="text-base sm:text-lg leading-relaxed mb-10 max-w-md"
+            style={{
+              color: "var(--foreground)",
+              opacity: 0.6,
+              fontFamily: "system-ui, sans-serif",
+            }}
           >
             Drop two versions of any contract. ClauseLens finds every revision,
             scores every risk, and explains what it means — in seconds.
@@ -411,7 +478,12 @@ export default function HomePage() {
               <motion.span
                 whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.97 }}
-                className="inline-flex items-center gap-2.5 px-8 py-4 bg-[#00ff88] text-black font-extrabold rounded-2xl text-sm cursor-pointer shadow-[0_0_60px_rgba(0,255,136,0.25)] hover:shadow-[0_0_80px_rgba(0,255,136,0.35)] transition-shadow"
+                className="inline-flex items-center gap-2.5 px-8 py-4 font-extrabold rounded-2xl text-sm cursor-pointer transition-shadow"
+                style={{
+                  background: "var(--accent)",
+                  color: "var(--background)",
+                  boxShadow: "0 0 60px color-mix(in srgb, var(--accent) 25%, transparent)",
+                }}
               >
                 <span>Analyze a Contract</span>
                 <motion.span
@@ -425,8 +497,13 @@ export default function HomePage() {
             </Link>
             <Link href="/about">
               <motion.span
-                whileHover={{ scale: 1.02, borderColor: "rgba(0,255,136,0.3)" }}
-                className="inline-flex items-center gap-2 px-6 py-4 border border-[#1e2a1e] text-neutral-400 font-semibold rounded-2xl text-sm cursor-pointer hover:text-white transition-all"
+                whileHover={{ scale: 1.02 }}
+                className="inline-flex items-center gap-2 px-6 py-4 font-semibold rounded-2xl text-sm cursor-pointer transition-all"
+                style={{
+                  border: "1px solid var(--border-color)",
+                  color: "var(--foreground)",
+                  opacity: 0.7,
+                }}
               >
                 How it works ↓
               </motion.span>
@@ -438,18 +515,25 @@ export default function HomePage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.9 }}
-            className="flex items-center gap-6 text-[10px] font-mono text-neutral-700 uppercase tracking-widest"
+            className="flex items-center gap-6 text-[10px] font-mono uppercase tracking-widest"
+            style={{ color: "var(--foreground)", opacity: 0.4 }}
           >
             <span className="flex items-center gap-1.5">
-              <span className="text-[#00ff88]">✓</span> No login
+              <span style={{ color: "var(--accent)" }}>✓</span> No login
             </span>
-            <span className="w-px h-3 bg-[#1e2a1e]" />
+            <span
+              className="w-px h-3"
+              style={{ background: "var(--border-color)" }}
+            />
             <span className="flex items-center gap-1.5">
-              <span className="text-[#00ff88]">✓</span> Zero data stored
+              <span style={{ color: "var(--accent)" }}>✓</span> Zero data stored
             </span>
-            <span className="w-px h-3 bg-[#1e2a1e]" />
+            <span
+              className="w-px h-3"
+              style={{ background: "var(--border-color)" }}
+            />
             <span className="flex items-center gap-1.5">
-              <span className="text-[#00ff88]">✓</span> Free
+              <span style={{ color: "var(--accent)" }}>✓</span> Free
             </span>
           </motion.div>
         </motion.div>
@@ -464,10 +548,19 @@ export default function HomePage() {
       </section>
 
       {/* ══════════ SECTION 2: HOW IT WORKS ══════════ */}
-      <section className="relative px-6 sm:px-12 py-24 overflow-hidden border-t border-[#1a201a]">
+      <section
+        className="relative px-6 sm:px-12 py-24 overflow-hidden"
+        style={{ borderTop: "1px solid var(--border-color)" }}
+      >
         {/* bg decoration */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-full bg-gradient-to-b from-transparent via-[#00ff88]/10 to-transparent" />
+          <div
+            className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-full"
+            style={{
+              background:
+                "linear-gradient(to bottom, transparent, var(--accent-muted), transparent)",
+            }}
+          />
         </div>
 
         <div className="max-w-6xl mx-auto">
@@ -479,15 +572,18 @@ export default function HomePage() {
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             className="flex flex-col items-center text-center mb-20"
           >
-            <span className="text-[10px] font-mono font-bold text-[#00ff88] uppercase tracking-[0.25em] mb-4">
+            <span
+              className="text-[10px] font-mono font-bold uppercase tracking-[0.25em] mb-4"
+              style={{ color: "var(--accent)" }}
+            >
               How It Works
             </span>
             <h2
               className="text-4xl sm:text-5xl xl:text-6xl font-extrabold leading-tight max-w-2xl"
-              style={{ fontFamily: "system-ui, sans-serif" }}
+              style={{ color: "var(--foreground)", fontFamily: "system-ui, sans-serif" }}
             >
               Three steps.{" "}
-              <span className="text-[#00ff88]">Total clarity.</span>
+              <span style={{ color: "var(--accent)" }}>Total clarity.</span>
             </h2>
           </motion.div>
 
@@ -499,12 +595,12 @@ export default function HomePage() {
                 initial={{ scaleX: 0 }}
                 whileInView={{ scaleX: 1 }}
                 viewport={{ once: true }}
-                transition={{
-                  duration: 1.2,
-                  delay: 0.3,
-                  ease: [0.22, 1, 0.36, 1],
+                transition={{ duration: 1.2, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                className="w-full h-full origin-left"
+                style={{
+                  background:
+                    "linear-gradient(to right, var(--accent-muted), rgba(0,170,255,0.15), var(--accent-muted))",
                 }}
-                className="w-full h-full bg-gradient-to-r from-[#00ff88]/20 via-[#00aaff]/20 to-[#00ff88]/20 origin-left"
               />
             </div>
 
@@ -514,7 +610,7 @@ export default function HomePage() {
               title="Upload both contracts"
               body="Drop your original and revised contract — PDF, DOCX, or TXT. No account. No email. Nothing stored."
               delay={0}
-              accent="#00ff88"
+              accent="var(--accent)"
             />
             <StepCard
               number="02"
@@ -530,7 +626,7 @@ export default function HomePage() {
               title="Get a risk breakdown"
               body="Each change is scored CRITICAL, MODERATE, or MINOR with a plain-English explanation and a clear recommendation: reject, negotiate, or accept."
               delay={0.3}
-              accent="#00ff88"
+              accent="var(--accent)"
             />
           </div>
 
@@ -550,19 +646,26 @@ export default function HomePage() {
             ].map((s, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: 0.5 + i * 0.08, duration: 0.45 }}
-                whileHover={{ borderColor: "rgba(0,255,136,0.3)", scale: 1.03 }}
-                className="flex flex-col items-center justify-center py-7 rounded-2xl border border-[#1a201a] bg-[#0d110d] transition-all duration-300 text-center gap-1"
+                transition={{ delay: 0.6 + i * 0.1, duration: 0.5 }}
+                whileHover={{ scale: 1.03 }}
+                className="flex flex-col items-center justify-center py-8 px-4 rounded-2xl text-center transition-all duration-300"
+                style={{
+                  border: "1px solid var(--border-color)",
+                  background: "var(--surface-strong)",
+                }}
               >
-                <span className="text-xl sm:text-2xl font-extrabold text-[#00ff88] font-mono">
+                <span
+                  className="text-2xl sm:text-3xl font-extrabold font-mono mb-1"
+                  style={{ color: "var(--accent)" }}
+                >
                   {s.val}
                 </span>
                 <span
-                  className="text-[10px] text-neutral-600 uppercase tracking-wider"
-                  style={{ fontFamily: "system-ui, sans-serif" }}
+                  className="text-[10px] uppercase tracking-widest font-mono"
+                  style={{ color: "var(--foreground)", opacity: 0.4 }}
                 >
                   {s.desc}
                 </span>
@@ -572,177 +675,93 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ══════════ SECTION 3: CTA CLOSE ══════════ */}
-      <section className="relative px-6 sm:px-12 py-24 overflow-hidden border-t border-[#1a201a]">
-        {/* massive glow */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-[#00ff88]/6 rounded-full blur-[130px]" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[200px] bg-[#00aaff]/4 rounded-full blur-[80px]" />
-        </div>
-        <Particles />
-
-        {/* grid overlay */}
+      {/* ══════════ SECTION 3: CTA ══════════ */}
+      <section
+        className="relative px-6 sm:px-12 py-28 overflow-hidden"
+        style={{ borderTop: "1px solid var(--border-color)" }}
+      >
         <div
-          className="absolute inset-0 opacity-[0.025] pointer-events-none"
-          style={{
-            backgroundImage:
-              "linear-gradient(#00ff88 1px, transparent 1px), linear-gradient(90deg, #00ff88 1px, transparent 1px)",
-            backgroundSize: "52px 52px",
-          }}
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: "var(--accent-muted)" }}
+        />
+        <div
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full blur-[100px] pointer-events-none"
+          style={{ background: "var(--accent-muted)" }}
         />
 
-        <div className="relative z-10 max-w-4xl mx-auto flex flex-col items-center text-center">
-          {/* pre-label */}
-          <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="text-[10px] font-mono font-bold text-[#00ff88] uppercase tracking-[0.25em] mb-6"
-          >
-            No Lawyer Required
-          </motion.p>
-
-          {/* giant headline */}
-          <motion.h2
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{
-              duration: 0.75,
-              delay: 0.1,
-              ease: [0.22, 1, 0.36, 1],
+        <motion.div
+          initial={{ opacity: 0, y: 32 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          className="relative max-w-3xl mx-auto flex flex-col items-center text-center gap-8"
+        >
+          <div
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-bold tracking-[0.2em] uppercase"
+            style={{
+              border: "1px solid var(--border-color)",
+              background: "var(--surface-strong)",
+              color: "var(--accent)",
             }}
-            className="text-5xl sm:text-6xl xl:text-7xl font-extrabold leading-[1.05] mb-6 tracking-tight"
-            style={{ fontFamily: "system-ui, sans-serif" }}
           >
-            Stop guessing. <br />
-            <span
-              className="text-[#00ff88] relative"
+            <motion.span
+              className="w-1.5 h-1.5 rounded-full"
+              style={{ background: "var(--accent)" }}
+              animate={{ opacity: [1, 0.2, 1] }}
+              transition={{ duration: 1.4, repeat: Infinity }}
+            />
+            Ready to analyze
+          </div>
+
+          <h2
+            className="text-4xl sm:text-5xl xl:text-6xl font-extrabold leading-tight"
+            style={{ color: "var(--foreground)", fontFamily: "system-ui, sans-serif" }}
+          >
+            Stop signing contracts{" "}
+            <span style={{ color: "var(--accent)" }}>blind.</span>
+          </h2>
+
+          <p
+            className="text-base sm:text-lg max-w-xl leading-relaxed"
+            style={{
+              color: "var(--foreground)",
+              opacity: 0.55,
+              fontFamily: "system-ui, sans-serif",
+            }}
+          >
+            Upload your contracts and get a full risk report in under 10 seconds.
+            No account. No credit card. Nothing stored.
+          </p>
+
+          <Link href="/ClauseLens">
+            <motion.span
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.97 }}
+              className="inline-flex items-center gap-3 px-10 py-5 font-extrabold rounded-2xl text-base cursor-pointer"
               style={{
-                textShadow: "0 0 60px rgba(0,255,136,0.3)",
+                background: "var(--accent)",
+                color: "var(--background)",
+                boxShadow: "0 0 80px color-mix(in srgb, var(--accent) 30%, transparent)",
               }}
             >
-              Start knowing.
-            </span>
-          </motion.h2>
-
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.55, delay: 0.25 }}
-            className="text-neutral-400 text-base sm:text-lg max-w-xl leading-relaxed mb-12"
-            style={{ fontFamily: "system-ui, sans-serif" }}
-          >
-            Every contract revision hides something. ClauseLens shows you
-            exactly what changed, what it costs you, and what to do next.
-          </motion.p>
-
-          {/* primary CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="flex flex-col sm:flex-row gap-4 items-center"
-          >
-            <Link href="/ClauseLens">
+              <span>Analyze a Contract — Free</span>
               <motion.span
-                whileHover={{ scale: 1.06 }}
-                whileTap={{ scale: 0.96 }}
-                className="inline-flex items-center gap-3 px-12 py-5 bg-[#00ff88] text-black font-extrabold rounded-2xl text-base cursor-pointer shadow-[0_0_80px_rgba(0,255,136,0.3)] hover:shadow-[0_0_120px_rgba(0,255,136,0.45)] transition-shadow"
+                animate={{ x: [0, 6, 0] }}
+                transition={{ duration: 1.1, repeat: Infinity }}
               >
-                <span>Analyze My Contract</span>
-                <motion.span
-                  animate={{ x: [0, 6, 0] }}
-                  transition={{ duration: 1.0, repeat: Infinity }}
-                  className="text-lg"
-                >
-                  ⚡
-                </motion.span>
+                →
               </motion.span>
-            </Link>
-          </motion.div>
+            </motion.span>
+          </Link>
 
-          {/* final micro copy */}
-          <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.65 }}
-            className="mt-6 text-[11px] font-mono text-neutral-700 uppercase tracking-widest"
+          <p
+            className="text-xs font-mono uppercase tracking-widest"
+            style={{ color: "var(--foreground)", opacity: 0.3 }}
           >
-            Free · Private · Instant
-          </motion.p>
-
-          {/* decorative risk tags */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.8 }}
-            className="mt-14 flex gap-3 flex-wrap justify-center"
-          >
-            {[
-              {
-                label: "CRITICAL",
-                color: "#ff4444",
-                bg: "#ff44441a",
-                border: "#ff444430",
-              },
-              {
-                label: "MODERATE",
-                color: "#ffaa00",
-                bg: "#ffaa001a",
-                border: "#ffaa0030",
-              },
-              {
-                label: "MINOR",
-                color: "#00ff88",
-                bg: "#00ff881a",
-                border: "#00ff8830",
-              },
-            ].map((r) => (
-              <motion.span
-                key={r.label}
-                whileHover={{ scale: 1.08, y: -2 }}
-                className="flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-extrabold font-mono uppercase tracking-wider transition-transform duration-200"
-                style={{
-                  color: r.color,
-                  background: r.bg,
-                  borderColor: r.border,
-                }}
-              >
-                <span
-                  className="w-1.5 h-1.5 rounded-full"
-                  style={{ background: r.color }}
-                />
-                {r.label}
-              </motion.span>
-            ))}
-          </motion.div>
-        </div>
+            PDF · DOCX · TXT &nbsp;·&nbsp; Max 10MB &nbsp;·&nbsp; No account required
+          </p>
+        </motion.div>
       </section>
-
-      {/* ══ FOOTER ══ */}
-      <motion.footer
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6 }}
-        className="py-10 px-6 flex flex-col sm:flex-row items-center justify-between border-t border-[#1a201a] text-neutral-700 text-[11px] font-mono tracking-widest uppercase gap-4"
-      >
-        <span>
-          <span className="text-[#00ff88]/40">ClauseLens</span> ©{" "}
-          {new Date().getFullYear()}
-        </span>
-        <Link href="/about">
-          <span className="hover:text-[#00ff88]/50 transition-colors cursor-pointer">
-            About →
-          </span>
-        </Link>
-      </motion.footer>
     </main>
   );
 }
