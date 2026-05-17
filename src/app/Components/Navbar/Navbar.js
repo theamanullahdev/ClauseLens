@@ -10,7 +10,7 @@ const navItems = [
   { label: "Home", href: "/" },
   { label: "About", href: "/About" },
   { label: "ClauseLens", href: "/ClauseLens" },
-  { label: "CV Maker", href: "/CVmaker" },
+ // { label: "CV Maker", href: "/CVmaker" },
 ];
 
 const Navbar = () => {
